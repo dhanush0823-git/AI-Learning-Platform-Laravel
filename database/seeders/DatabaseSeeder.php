@@ -7,12 +7,22 @@ use App\Models\Course;
 use App\Models\Modules;
 use App\Models\Lessons;
 use App\Models\Students;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        User::updateOrCreate(
+            ['email' => 'admin@ailearning.local'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('Admin@12345'),
+                'is_super_admin' => true,
+            ]
+        );
+
         // Create Departments
         $departments = [
             ['code' => 'CSE', 'name' => 'Computer Science & Engineering', 'icon' => '💻', 'color' => '#4285F4'],
