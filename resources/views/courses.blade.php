@@ -22,7 +22,8 @@
     </div>
 
     {{-- ── Filter Card ── --}}
-    <div style="background: #fff; border: 1px solid #eaeaea; border-radius: 16px; padding: 20px 24px; margin-bottom: 28px; box-shadow: 0 2px 12px rgba(0,0,0,.05);">
+    @if(!Auth::guard('student')->check())
+     <div style="background: #fff; border: 1px solid #eaeaea; border-radius: 16px; padding: 20px 24px; margin-bottom: 28px; box-shadow: 0 2px 12px rgba(0,0,0,.05);">
       <form method="GET" action="{{ route('courses', [], false) }}" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;">
 
         <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px;">
@@ -80,6 +81,7 @@
 
       </form>
     </div>
+    @endif
 
     {{-- ── Count Row ── --}}
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">

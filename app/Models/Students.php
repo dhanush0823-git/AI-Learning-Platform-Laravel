@@ -11,7 +11,7 @@ class Students extends Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'reg_no', 'name', 'email', 'department_id', 'password', 'level', 'avatar', 'streak_days', 'total_progress'
+        'reg_no', 'name', 'email', 'department_id', 'password', 'level', 'avatar', 'streak_days', 'total_progress','batch'
     ];
 
     protected $hidden = [
