@@ -6,6 +6,7 @@
   <title>Register - AI Learning Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="shortcut icon" href="{{ asset('assets/favicon.png') }}" type="image/x-icon">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
     .gradient-bg { background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #f0fff4 100%); }
