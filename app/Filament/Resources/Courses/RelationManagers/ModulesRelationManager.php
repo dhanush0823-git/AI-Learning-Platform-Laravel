@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Courses\RelationManagers;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -37,6 +39,41 @@ class ModulesRelationManager extends RelationManager
                     ->suffix('min'),
                 Toggle::make('completed')
                     ->default(false),
+                Repeater::make('lessons')
+                    ->relationship()
+                    ->schema([
+                        TextInput::make('lesson_number')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1),
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255),
+                        Select::make('lesson_type')
+                            ->options([
+                                'video' => 'Video',
+                                'reading' => 'Reading',
+                                'quiz' => 'Quiz',
+                            ])
+                            ->required(),
+                        TextInput::make('duration')
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(10)
+                            ->suffix('min'),
+                        TextInput::make('video_url')
+                            ->url()
+                            ->placeholder('https://...')
+                            ->maxLength(255),
+                        Textarea::make('content')
+                            ->required()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->orderColumn('lesson_number')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                    ->columnSpanFull(),
             ]);
     }
 
