@@ -20,7 +20,14 @@
                 <h3 style="margin: 0 0 8px;">Module {{ $module->module_number }}: {{ $module->title }}</h3>
                 <ul style="margin: 0; padding-left: 18px;">
                     @foreach($module->lessons as $lesson)
-                        <li>{{ $lesson->lesson_number }}. {{ $lesson->title }} ({{ $lesson->lesson_type }})</li>
+                        <li style="margin-bottom: 10px;">
+                            <div>{{ $lesson->lesson_number }}. {{ $lesson->title }} ({{ $lesson->lesson_type }})</div>
+                            @if(! empty($lesson->content))
+                                <div style="margin-top: 6px; color: #374151;">
+                                    {!! \Illuminate\Support\Str::markdown($lesson->content, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
+                                </div>
+                            @endif
+                        </li>
                     @endforeach
                 </ul>
             </article>

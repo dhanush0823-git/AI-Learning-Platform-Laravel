@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Courses\RelationManagers;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -65,7 +66,7 @@ class ModulesRelationManager extends RelationManager
                             ->url()
                             ->placeholder('https://...')
                             ->maxLength(255),
-                        Textarea::make('content')
+                        MarkdownEditor::make('content')
                             ->required()
                             ->columnSpanFull(),
                     ])

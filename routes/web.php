@@ -16,6 +16,8 @@ use App\Http\Controllers\CSEDashboardController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/courses', [CourseController::class, 'index'])->name('courses');
 Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+Route::get('/courses/{courseId}/modules/{moduleId}/lessons/{lessonId}', [CourseController::class, 'lesson'])
+    ->name('courses.lessons.show');
 Route::get('/help', [HelpController::class, 'index'])->name('help');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::get('/privacy', function () { return view('privacy'); })->name('privacy');

@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Lessons;
 use App\Models\Departments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,5 +48,21 @@ class CourseController extends Controller
     {
         $course = Course::with(['department', 'modules.lessons'])->findOrFail($id);
         return view('courses.show', compact('course'));
+    }
+
+    public function lesson($courseId, $moduleId, $lessonId)
+    {
+        $course = Course::with('department')->findOrFail($courseId);
+
+        $lesson = Lessons::with('module')
+            ->where('id', $lessonId)
+            ->where('module_id', $moduleId)
+            ->firstOrFail();
+
+        abort_unless((int) $lesson->module->course_id === (int) $course->id, 404);
+
+        $module = $lesson->module;
+
+        return view('courses.lesson', compact('course', 'module', 'lesson'));
     }
 }

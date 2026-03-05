@@ -168,7 +168,8 @@
                   $tc   = $typeColors[$type] ?? ['bg' => '#f1f5f9', 'color' => '#475569', 'icon' => '📄'];
                 @endphp
 
-                <div style="display: flex; align-items: center; gap: 14px; padding: 11px 22px; border-bottom: 1px solid #fafafa; transition: background .15s;"
+                <a href="{{ route('courses.lessons.show', ['courseId' => $course->id, 'moduleId' => $module->id, 'lessonId' => $lesson->id], false) }}"
+                  style="display: flex; align-items: center; gap: 14px; padding: 11px 22px; border-bottom: 1px solid #fafafa; transition: background .15s; text-decoration: none; color: inherit;"
                   onmouseover="this.style.background='#fafbff';"
                   onmouseout="this.style.background='';">
 
@@ -178,15 +179,20 @@
                   </div>
 
                   {{-- Title --}}
-                  <span style="font-size: 14px; color: #1a1a1a; font-weight: 500; flex: 1;">
-                    {{ $lesson->title }}
-                  </span>
+                  <div style="font-size: 14px; color: #1a1a1a; font-weight: 500; flex: 1;">
+                    <div>{{ $lesson->title }}</div>
+                    @if(! empty($lesson->content))
+                      <div style="margin-top: 6px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+                        {!! \Illuminate\Support\Str::markdown($lesson->content, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
+                      </div>
+                    @endif
+                  </div>
 
                   {{-- Type badge --}}
                   <span style="display: inline-flex; align-items: center; gap: 4px; background: {{ $tc['bg'] }}; color: {{ $tc['color'] }}; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;">
                     {{ $tc['icon'] }} {{ ucfirst($lesson->lesson_type) }}
                   </span>
-                </div>
+                </a>
               @endforeach
             </div>
           @endif
