@@ -20,6 +20,11 @@
         Explore courses across departments and skill levels — from foundations to advanced specializations.
       </p>
     </div>
+      @auth('student')
+        <p style="font-size: 13px; color: #2563eb; margin: 10px 0 0; font-weight: 600;">
+          Showing courses for your diagnostic level: {{ strtoupper($filteredLevel ?? auth('student')->user()->level) }}
+        </p>
+      @endauth
 
     {{-- ── Filter Card ── --}}
     @if(!Auth::guard('student')->check())
@@ -162,13 +167,19 @@
         <div style="grid-column: 1 / -1; background: #fff; border: 1px dashed #ddd; border-radius: 16px; padding: 64px 20px; text-align: center;">
           <div style="font-size: 52px; margin-bottom: 14px;">🔍</div>
           <h3 style="font-size: 18px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px;">No courses found</h3>
-          <p style="font-size: 14px; color: #888; margin: 0 0 24px; max-width: 280px; margin-left: auto; margin-right: auto;">
-            Try adjusting your department or difficulty filters to find what you're looking for.
-          </p>
-          <a href="{{ route('courses', [], false) }}"
-            style="display: inline-block; padding: 11px 24px; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: #fff; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(66,133,244,.3);">
-            Clear All Filters
-          </a>
+          @auth('student')
+            <p style="font-size: 14px; color: #888; margin: 0; max-width: 360px; margin-left: auto; margin-right: auto;">
+              No courses available for your current diagnostic level ({{ strtoupper($filteredLevel ?? auth('student')->user()->level) }}) in your department.
+            </p>
+          @else
+            <p style="font-size: 14px; color: #888; margin: 0 0 24px; max-width: 280px; margin-left: auto; margin-right: auto;">
+              Try adjusting your department or difficulty filters to find what you're looking for.
+            </p>
+            <a href="{{ route('courses', [], false) }}"
+              style="display: inline-block; padding: 11px 24px; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: #fff; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(66,133,244,.3);">
+              Clear All Filters
+            </a>
+          @endauth
         </div>
       @endforelse
 

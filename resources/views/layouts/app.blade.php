@@ -7,382 +7,363 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'AI Learning Platform')</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link rel="shortcut icon" href="{{ asset('assets/favicon.png') }}" type="image/x-icon">
 
-    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          }
-        }
-      }
-    </script>
 
-    <!-- Vite (only if built) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css'])
     @endif
 
     <style>
-      body { font-family: 'Inter', system-ui, sans-serif; }
+      *, *::before, *::after { box-sizing: border-box; }
+      body { font-family: 'Inter', system-ui, sans-serif; margin: 0; background: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
 
-      /* Active nav item gradient */
-      .nav-active {
-        background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
-        color: white !important;
-        box-shadow: 0 4px 12px rgba(66,133,244,0.3);
+      /* ─── NAVBAR ─────────────────────────────── */
+      .navbar {
+        position: sticky; top: 0; z-index: 50;
+        background: #fff;
+        border-bottom: 1px solid #eaeaea;
+        transition: box-shadow 0.25s;
+      }
+      .navbar.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+      .nav-inner {
+        /* Full width but capped */
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 16px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
 
-      /* Gradient text */
-      .gradient-text {
-        background: linear-gradient(135deg, #4285F4, #34A853);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+      /* ── Brand (fixed, don't grow) */
+      .nav-brand {
+        display: flex; align-items: center; gap: 9px;
+        text-decoration: none; flex-shrink: 0;
+      }
+      .brand-icon {
+        width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+        background: linear-gradient(135deg,#4285F4,#34A853);
+        display: flex; align-items: center; justify-content: center; font-size: 17px;
+      }
+      .brand-text { line-height: 1; }
+      .brand-name { font-size: 13.5px; font-weight: 800; color: #1a1a1a; white-space: nowrap; }
+      .brand-sub  { font-size: 10.5px; color: #aaa; margin-top: 2px; white-space: nowrap; }
+
+      /* ── Links pill (grows to fill space, never wraps) */
+      .nav-links {
+        display: flex; align-items: center; gap: 2px;
+        flex-wrap: nowrap;          /* NEVER wrap to second line */
+        background: #f5f6f8; border: 1px solid #e8e9eb;
+        border-radius: 12px; padding: 4px;
+        flex: 1;
+        min-width: 0;
+        height: 44px;              /* fixed height = single row always */
+        overflow: visible;
       }
 
-      /* Gradient button */
-      .btn-gradient {
-        background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
-        transition: all 0.2s ease;
+      .nav-link {
+        display: flex; align-items: center; gap: 5px;
+        padding: 6px 11px;
+        border-radius: 8px;
+        font-size: 13px; font-weight: 600;
+        white-space: nowrap;       /* each link text stays on one line */
+        text-decoration: none; color: #555;
+        transition: background 0.15s, color 0.15s;
+        flex-shrink: 0;
+        height: 34px;              /* fixed height prevents icon pushing row taller */
+        line-height: 1;
       }
-      .btn-gradient:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(66,133,244,0.35);
+      .nav-link:hover:not(.active) { background: #fff; color: #111; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+      .nav-link.active {
+        background: linear-gradient(135deg,#4285F4,#34A853);
+        color: #fff !important;
+        box-shadow: 0 2px 8px rgba(66,133,244,0.28);
       }
 
-      /* Footer gradient bg */
-      .footer-bg {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      .nav-icon { font-size: 14px; line-height: 1; }
+      .nav-badge {
+        font-size: 9px; font-weight: 800;
+        padding: 2px 4px; border-radius: 4px; line-height: 1.2;
+      }
+      .badge-dt { background: #ede9fe; color: #7c3aed; }
+      .badge-ai { background: #dbeafe; color: #1d4ed8; }
+
+      /* ── Right side (fixed, don't grow) */
+      .nav-right {
+        display: flex; align-items: center; gap: 7px; flex-shrink: 0;
       }
 
-      /* Scrolled navbar shadow */
-      .nav-scrolled {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      .user-pill {
+        display: flex; align-items: center; gap: 7px;
+        background: #f5f6f8; border: 1px solid #e8e9eb;
+        border-radius: 12px; padding: 4px 9px 4px 5px;
+      }
+      .avatar {
+        position: relative; width: 28px; height: 28px; border-radius: 50%;
+        background: linear-gradient(135deg,#4285F4,#34A853);
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 11px; font-weight: 800; flex-shrink: 0;
+      }
+      .avatar-dot {
+        position: absolute; bottom: 0; right: 0;
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #34A853; border: 1.5px solid #fff;
+      }
+      .uname { font-size: 12.5px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+      .urole { font-size: 10.5px; color: #aaa; }
+
+      .logout-btn {
+        font-size: 11.5px; font-weight: 600; color: #ef4444;
+        background: #fef2f2; border: 1px solid #fecaca;
+        border-radius: 7px; padding: 4px 9px; cursor: pointer;
+        transition: background 0.15s; white-space: nowrap; font-family: inherit;
+      }
+      .logout-btn:hover { background: #fee2e2; }
+
+      .btn-login {
+        font-size: 12.5px; font-weight: 600; color: #4285F4;
+        border: 1.5px solid #c7d8fd; background: #fff;
+        border-radius: 9px; padding: 6px 13px;
+        text-decoration: none; transition: all 0.15s; white-space: nowrap;
+      }
+      .btn-login:hover { background: #eff6ff; border-color: #4285F4; }
+
+      .btn-signup {
+        font-size: 12.5px; font-weight: 600; color: #fff;
+        background: linear-gradient(135deg,#4285F4,#34A853);
+        border-radius: 9px; padding: 6px 13px;
+        text-decoration: none; white-space: nowrap;
+        box-shadow: 0 3px 10px rgba(66,133,244,0.28);
+        transition: all 0.15s;
+      }
+      .btn-signup:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(66,133,244,0.38); }
+
+      .hamburger {
+        display: none; width: 34px; height: 34px; border-radius: 9px;
+        background: #f3f4f6; border: none; cursor: pointer;
+        align-items: center; justify-content: center; flex-shrink: 0;
       }
 
-      /* Mobile menu transition */
-      #mobileMenu { transition: max-height 0.3s ease, opacity 0.3s ease; }
+      /* ── Responsive ──────────────────────────── */
+      /* At 1180px the 7-item nav still fits comfortably */
+      @media (max-width: 1080px) {
+        .nav-links  { display: none; }
+        .hamburger  { display: flex; }
+        .brand-sub  { display: none; }
+      }
+      @media (max-width: 600px) {
+        .uname, .urole { display: none; }
+        .nav-inner { padding: 0 10px; }
+        .btn-login { display: none; }
+      }
+
+      /* ── Mobile menu ─────────────────────────── */
+      .mobile-menu { display: none; border-top: 1px solid #eaeaea; background: #fff; }
+      .mobile-menu.open { display: block; }
+      .mobile-menu-inner { max-width: 1400px; margin: 0 auto; padding: 8px 14px 14px; }
+      .mob-link {
+        display: flex; align-items: center; gap: 9px;
+        padding: 9px 13px; border-radius: 10px; margin-bottom: 2px;
+        font-size: 13.5px; font-weight: 600; color: #555;
+        text-decoration: none; transition: background 0.15s;
+      }
+      .mob-link:hover { background: #f5f6f8; color: #111; }
+      .mob-link.active { background: linear-gradient(135deg,#4285F4,#34A853); color: #fff; }
+      .mob-auth { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+      .mob-auth a {
+        flex: 1; text-align: center; padding: 9px 12px;
+        border-radius: 10px; font-size: 13px; font-weight: 600;
+        text-decoration: none;
+      }
+
+      /* ─── FOOTER ─────────────────────────────── */
+      .footer { background: linear-gradient(135deg,#1a1a1a,#2d2d2d); color: #fff; margin-top: auto; }
+      .footer-inner { max-width: 1200px; margin: 0 auto; padding: 52px 24px 28px; }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr 1fr 0.8fr;
+        gap: 36px;
+        padding-bottom: 36px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .f-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+      .f-logo-icon { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg,#4285F4,#34A853); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+      .f-logo-name { font-size: 13.5px; font-weight: 800; }
+      .f-logo-sub  { font-size: 10.5px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+      .f-desc { font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.65; margin-bottom: 14px; }
+      .f-status { display: flex; gap: 12px; flex-wrap: wrap; }
+      .f-status span { display: flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,0.38); }
+      .f-dot { width: 5px; height: 5px; border-radius: 50%; }
+      .f-col h4 { font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.32); margin-bottom: 14px; }
+      .f-col a, .f-col span { display: block; font-size: 12.5px; color: rgba(255,255,255,0.58); text-decoration: none; margin-bottom: 9px; transition: color 0.15s, padding-left 0.15s; }
+      .f-col a:hover { color: #fff; padding-left: 4px; }
+      .f-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 22px; }
+      .f-bottom p, .f-bottom span { font-size: 11.5px; color: rgba(255,255,255,0.32); }
+      .f-bottom-right { display: flex; gap: 16px; }
+      @media (max-width: 900px)  { .footer-grid { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 520px)  { .footer-grid { grid-template-columns: 1fr; } .f-bottom { flex-direction: column; text-align: center; } }
     </style>
 
     @stack('styles')
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body>
 
-  {{-- ════════════════════════════════════
-       NAVBAR
-  ════════════════════════════════════ --}}
-  <nav id="navbar"
-       class="bg-white border-b border-gray-200 sticky top-0 z-50 transition-all duration-300"
-       style="font-family: Inter, system-ui, sans-serif;">
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
-      <div class="flex items-center justify-between h-16 gap-4">
+  {{-- ══ NAVBAR ══════════════════════════════════════ --}}
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
 
-        {{-- Brand --}}
-        <a href="{{ route('home') }}" class="flex items-center gap-2.5 flex-shrink-0 group">
-          <div class="w-9 h-9 rounded-xl btn-gradient flex items-center justify-center text-lg flex-shrink-0">
-            🎓
-          </div>
-          <div class="hidden sm:block">
-            <span class="text-base font-extrabold text-gray-900 leading-none block">AI Learning Platform</span>
-            <span class="text-xs text-gray-400 leading-none mt-0.5 block">Smart Education System</span>
-          </div>
-        </a>
-
-        {{-- Desktop Nav Links --}}
-        <div class="hidden lg:flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xl px-2 py-1.5">
-
-          <a href="{{ route('home') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('home') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-base leading-none">🏠</span>
-            <span>Home</span>
-          </a>
-
-          <a href="{{ route('courses') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('courses*') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-base leading-none">📚</span>
-            <span>Courses</span>
-          </a>
-
-          <a href="{{ route('learn') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('learn*') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-base leading-none">🎯</span>
-            <span>Learning Path</span>
-          </a>
-
-          @auth('student')
-          <a href="{{ route('diagnostic.test') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('diagnostic.*') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-xs font-bold leading-none bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">DT</span>
-            <span>Diagnostic</span>
-          </a>
-
-          <a href="{{ route('chat.index') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('chat.*') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-xs font-bold leading-none bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">AI</span>
-            <span>AI Chat</span>
-          </a>
-          @endauth
-
-          <a href="{{ route('assessments') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('assessments*') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-base leading-none">📝</span>
-            <span>Assessments</span>
-          </a>
-
-          <a href="{{ route('dashboard') }}"
-             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all
-                    {{ request()->routeIs('dashboard') ? 'nav-active' : 'text-gray-600 hover:text-gray-900 hover:bg-white' }}">
-            <span class="text-base leading-none">📊</span>
-            <span>Dashboard</span>
-          </a>
-
+      {{-- Brand --}}
+      <a href="{{ route('home') }}" class="nav-brand">
+        <div class="brand-icon">🎓</div>
+        <div class="brand-text">
+          <div class="brand-name">AI Learning Platform</div>
+          <div class="brand-sub">Smart Education System</div>
         </div>
+      </a>
 
-        {{-- Right: User / Auth --}}
-        <div class="flex items-center gap-2 flex-shrink-0">
+      {{-- Desktop links --}}
+      <div class="nav-links">
+        <a href="{{ route('home') }}"        class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"><span class="nav-icon">🏠</span>Home</a>
+        <a href="{{ route('courses') }}"     class="nav-link {{ request()->routeIs('courses*') ? 'active' : '' }}"><span class="nav-icon">📚</span>Courses</a>
+        <a href="{{ route('learn') }}"       class="nav-link {{ request()->routeIs('learn*') ? 'active' : '' }}"><span class="nav-icon">🎯</span>Learning Path</a>
+        @auth('student')
+        <a href="{{ route('diagnostic.test') }}" class="nav-link {{ request()->routeIs('diagnostic.*') ? 'active' : '' }}"><span class="nav-badge badge-dt">DT</span>Diagnostic</a>
+        <a href="{{ route('chat.index') }}"  class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}"><span class="nav-badge badge-ai">AI</span>AI Chat</a>
+        @endauth
+        <a href="{{ route('assessments') }}" class="nav-link {{ request()->routeIs('assessments*') ? 'active' : '' }}"><span class="nav-icon">📝</span>Assessments</a>
+        <a href="{{ route('dashboard') }}"   class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><span class="nav-icon">📊</span>Dashboard</a>
+      </div>
 
-          @auth('student')
-            {{-- User profile pill --}}
-            <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-              <div class="relative flex-shrink-0">
-                <div class="w-7 h-7 rounded-full btn-gradient flex items-center justify-center text-white text-xs font-bold">
-                  {{ strtoupper(substr(auth('student')->user()->name, 0, 1)) }}
-                </div>
-                <div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></div>
-              </div>
-              <div class="hidden md:block">
-                <p class="text-xs font-bold text-gray-800 leading-none">{{ auth('student')->user()->name }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">Learner</p>
-              </div>
-              <form method="POST" action="{{ route('logout') }}" class="ml-1">
-                @csrf
-                <button type="submit"
-                  class="text-xs font-semibold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-lg transition-colors border border-red-100">
-                  Logout
-                </button>
-              </form>
+      {{-- Right --}}
+      <div class="nav-right">
+        @auth('student')
+          <div class="user-pill">
+            <div class="avatar">
+              {{ strtoupper(substr(auth('student')->user()->name, 0, 1)) }}
+              <div class="avatar-dot"></div>
             </div>
-          @else
-            <a href="{{ route('login') }}"
-               class="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-blue-600 border border-blue-200 hover:border-blue-400 bg-white hover:bg-blue-50 px-3.5 py-2 rounded-xl transition-all">
-              🔑 Log In
-            </a>
-            <a href="{{ route('register') }}"
-               class="flex items-center gap-1.5 text-sm font-semibold text-white btn-gradient px-3.5 py-2 rounded-xl shadow-sm">
-              ✨ Sign Up
-            </a>
-          @endauth
-
-          {{-- Mobile hamburger --}}
-          <button id="mobileToggle"
-            class="lg:hidden w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-            onclick="toggleMobile()">
-            <svg id="menuIcon" class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
-
-        </div>
+            <div style="display:flex;flex-direction:column;">
+              <span class="uname">{{ auth('student')->user()->name }}</span>
+              <span class="urole">Learner</span>
+            </div>
+            <form method="POST" action="{{ route('logout') }}" style="display:inline;margin:0;">
+              @csrf
+              <button type="submit" class="logout-btn">Logout</button>
+            </form>
+          </div>
+        @else
+          <a href="{{ route('login') }}"    class="btn-login">🔑 Log In</a>
+          <a href="{{ route('register') }}" class="btn-signup">✨ Sign Up</a>
+        @endauth
+        <button class="hamburger" id="hamburger" onclick="toggleMobile()" aria-label="Menu">
+          <svg id="ham-icon" width="17" height="17" fill="none" stroke="#555" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
       </div>
     </div>
 
-    {{-- Mobile Menu --}}
-    <div id="mobileMenu" class="lg:hidden hidden border-t border-gray-100 bg-white">
-      <div class="max-w-screen-xl mx-auto px-4 py-3 space-y-1">
-
-        <a href="{{ route('home') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('home') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          🏠 Home
-        </a>
-        <a href="{{ route('courses') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('courses*') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          📚 Courses
-        </a>
-        <a href="{{ route('learn') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('learn*') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          🎯 Learning Path
-        </a>
-
+    {{-- Mobile menu --}}
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-inner">
+        <a href="{{ route('home') }}"        class="mob-link {{ request()->routeIs('home') ? 'active' : '' }}">🏠 Home</a>
+        <a href="{{ route('courses') }}"     class="mob-link {{ request()->routeIs('courses*') ? 'active' : '' }}">📚 Courses</a>
+        <a href="{{ route('learn') }}"       class="mob-link {{ request()->routeIs('learn*') ? 'active' : '' }}">🎯 Learning Path</a>
         @auth('student')
-        <a href="{{ route('diagnostic.test') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('diagnostic.*') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          🧪 Diagnostic Test
-        </a>
-        <a href="{{ route('chat.index') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('chat.*') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          🤖 AI Chat
-        </a>
+        <a href="{{ route('diagnostic.test') }}" class="mob-link {{ request()->routeIs('diagnostic.*') ? 'active' : '' }}">🧪 Diagnostic Test</a>
+        <a href="{{ route('chat.index') }}"  class="mob-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">🤖 AI Chat</a>
         @endauth
-
-        <a href="{{ route('assessments') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('assessments*') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          📝 Assessments
-        </a>
-        <a href="{{ route('dashboard') }}"
-           class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all
-                  {{ request()->routeIs('dashboard') ? 'nav-active' : 'text-gray-600 hover:bg-gray-50' }}">
-          📊 Dashboard
-        </a>
-
+        <a href="{{ route('assessments') }}" class="mob-link {{ request()->routeIs('assessments*') ? 'active' : '' }}">📝 Assessments</a>
+        <a href="{{ route('dashboard') }}"   class="mob-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">📊 Dashboard</a>
         @guest('student')
-        <div class="flex gap-2 pt-2 border-t border-gray-100 mt-2">
-          <a href="{{ route('login') }}"
-             class="flex-1 text-center text-sm font-semibold text-blue-600 border border-blue-200 px-4 py-2.5 rounded-xl hover:bg-blue-50 transition-colors">
-            🔑 Log In
-          </a>
-          <a href="{{ route('register') }}"
-             class="flex-1 text-center text-sm font-semibold text-white btn-gradient px-4 py-2.5 rounded-xl">
-            ✨ Sign Up
-          </a>
+        <div class="mob-auth">
+          <a href="{{ route('login') }}"    style="color:#4285F4;border:1.5px solid #c7d8fd;">🔑 Log In</a>
+          <a href="{{ route('register') }}" style="color:#fff;background:linear-gradient(135deg,#4285F4,#34A853);">✨ Sign Up</a>
         </div>
         @endguest
-
       </div>
     </div>
   </nav>
 
-  {{-- ════════════════════════════════════
-       MAIN CONTENT
-  ════════════════════════════════════ --}}
-  <main class="flex-1">
+  {{-- ══ MAIN ════════════════════════════════════════ --}}
+  <main style="flex:1;">
     @yield('content')
   </main>
 
-  {{-- ════════════════════════════════════
-       FOOTER
-  ════════════════════════════════════ --}}
-  <footer class="footer-bg text-white mt-auto">
-    <div class="max-w-screen-xl mx-auto px-6 py-14">
-
-      {{-- Top grid --}}
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10 border-b border-white/10">
-
-        {{-- Brand column --}}
-        <div class="md:col-span-1">
-          <div class="flex items-center gap-2.5 mb-4">
-            <div class="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center text-xl">🎓</div>
+  {{-- ══ FOOTER ══════════════════════════════════════ --}}
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="f-logo">
+            <div class="f-logo-icon">🎓</div>
             <div>
-              <span class="text-base font-extrabold text-white block leading-none">AI Learning Platform</span>
-              <span class="text-xs text-white/50 mt-0.5 block">Smart Education System</span>
+              <div class="f-logo-name">AI Learning Platform</div>
+              <div class="f-logo-sub">Smart Education System</div>
             </div>
           </div>
-          <p class="text-sm text-white/60 leading-relaxed max-w-xs">
-            Smart education system for engineering colleges with AI-powered personalized learning paths and real-time progress tracking.
-          </p>
-          {{-- Status badges --}}
-          <div class="flex items-center gap-3 mt-5">
-            <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-green-400"></span>
-              <span class="text-xs text-white/50">System Online</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-              <span class="text-xs text-white/50">AI Active 🤖</span>
-            </div>
+          <p class="f-desc">AI-powered personalized learning for engineering colleges with department-specific courses and real-time progress tracking.</p>
+          <div class="f-status">
+            <span><span class="f-dot" style="background:#34A853;"></span>System Online</span>
+            <span><span class="f-dot" style="background:#4285F4;"></span>AI Active 🤖</span>
           </div>
         </div>
-
-        {{-- Links columns --}}
-        <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-8">
-
-          <div>
-            <h4 class="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Platform</h4>
-            <div class="space-y-2.5">
-              <a href="{{ route('courses') }}"     class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Courses</a>
-              <a href="{{ route('dashboard') }}"   class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Dashboard</a>
-              <a href="{{ route('assessments') }}" class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Assessments</a>
-              <a href="{{ route('learn') }}"       class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Learning Path</a>
-            </div>
-          </div>
-
-          <div>
-            <h4 class="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Support</h4>
-            <div class="space-y-2.5">
-              <a href="{{ route('help') }}"    class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Help Center</a>
-              <a href="{{ route('contact') }}" class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Contact Us</a>
-              <a href="{{ route('privacy') }}" class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Privacy Policy</a>
-              <a href="{{ route('terms') }}"   class="block text-sm text-white/70 hover:text-white transition-colors hover:translate-x-1 transform">Terms of Service</a>
-            </div>
-          </div>
-
-          <div>
-            <h4 class="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Departments</h4>
-            <div class="space-y-2.5">
-              <span class="block text-sm text-white/70">💻 CSE</span>
-              <span class="block text-sm text-white/70">⚡ ECE</span>
-              <span class="block text-sm text-white/70">⚙️ MECH</span>
-              <span class="block text-sm text-white/70">🤖 AIML</span>
-              <span class="block text-sm text-white/70">🏗️ CIVIL</span>
-            </div>
-          </div>
-
+        <div class="f-col">
+          <h4>Platform</h4>
+          <a href="{{ route('courses') }}">Courses</a>
+          <a href="{{ route('dashboard') }}">Dashboard</a>
+          <a href="{{ route('assessments') }}">Assessments</a>
+          <a href="{{ route('learn') }}">Learning Path</a>
+        </div>
+        <div class="f-col">
+          <h4>Support</h4>
+          <a href="{{ route('help') }}">Help Center</a>
+          <a href="{{ route('contact') }}">Contact Us</a>
+          <a href="{{ route('privacy') }}">Privacy Policy</a>
+          <a href="{{ route('terms') }}">Terms of Service</a>
+        </div>
+        <div class="f-col">
+          <h4>Departments</h4>
+          <span>💻 CSE</span>
+          <span>⚡ ECE</span>
+          <span>⚙️ MECH</span>
+          <span>🤖 AIML</span>
+          <span>🏗️ CIVIL</span>
         </div>
       </div>
-
-      {{-- Bottom bar --}}
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
-        <p class="text-xs text-white/40 text-center sm:text-left">
-          © {{ date('Y') }} AI Learning Platform. Smart Education System for Engineering Colleges.
-        </p>
-        <div class="flex items-center gap-4">
-          <span class="flex items-center gap-1.5 text-xs text-white/40">
-            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-            System Operational
-          </span>
-          <span class="text-xs text-white/40">AI Assistant: Online 🤖</span>
+      <div class="f-bottom">
+        <p>© {{ date('Y') }} AI Learning Platform. Smart Education System for Engineering Colleges.</p>
+        <div class="f-bottom-right">
+          <span>System: Operational ✓</span>
+          <span>AI Assistant: Online 🤖</span>
         </div>
       </div>
-
     </div>
   </footer>
 
-  {{-- Scripts --}}
   @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
       @vite(['resources/js/app.js'])
   @endif
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
   <script>
-    // Mobile menu toggle
-    function toggleMobile() {
-      const menu = document.getElementById('mobileMenu');
-      const icon = document.getElementById('menuIcon');
-      const isOpen = !menu.classList.contains('hidden');
-      menu.classList.toggle('hidden');
-      icon.innerHTML = isOpen
-        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>'
-        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
-    }
-
-    // Navbar scroll shadow
     window.addEventListener('scroll', () => {
-      const nav = document.getElementById('navbar');
-      if (window.scrollY > 10) {
-        nav.classList.add('nav-scrolled');
-      } else {
-        nav.classList.remove('nav-scrolled');
-      }
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 8);
     });
+    function toggleMobile() {
+      const m = document.getElementById('mobileMenu');
+      const i = document.getElementById('ham-icon');
+      const open = m.classList.toggle('open');
+      i.innerHTML = open
+        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
+    }
   </script>
-
   @stack('scripts')
 </body>
 </html>

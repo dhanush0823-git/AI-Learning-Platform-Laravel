@@ -13,10 +13,20 @@ class CourseController extends Controller
     {
         $departments = Departments::all();
         $student = Auth::guard('student')->user();
+        $filteredLevel = null;
 
         if ($student) {
+            if (! $student->diagnosticAttempts()->exists()) {
+                return redirect()
+                    ->route('diagnostic.test')
+                    ->with('warning', 'Please complete diagnostic test first.');
+            }
+
+            $filteredLevel = $student->level;
+
             $courses = Course::with('department')
                 ->where('department_id', $student->department_id)
+                ->where('difficulty', $student->level)
                 ->get();
         } else {
             $query = Course::with('department');
@@ -41,7 +51,7 @@ class CourseController extends Controller
             (object)['value' => 'advanced', 'name' => 'Advanced', 'color' => '#EA4335']
         ];
         
-        return view('courses', compact('courses', 'departments', 'difficulties'));
+        return view('courses', compact('courses', 'departments', 'difficulties', 'filteredLevel'));
     }
 
     public function show($id)
