@@ -116,17 +116,17 @@
     </div>
 
     <!-- MAIN GRID -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
 
       <!-- STUDENT TABLE -->
-      <div class="xl:col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="xl:col-span-2 self-start bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 class="text-base font-bold text-gray-900">Student Details</h3>
             <p class="text-xs text-gray-400 mt-0.5">All enrolled students in your department</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
-            <select id="deptFilter" class="text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
+            <!-- <select id="deptFilter" class="text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
               <option value="ALL">All Depts</option>
               <option value="CSE">CSE</option>
               <option value="ECE">ECE</option>
@@ -138,7 +138,7 @@
               <option value="ALL">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
-            </select>
+            </select> -->
             <button class="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all" style="background: linear-gradient(135deg,#4285F4,#34A853)">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
               Export
@@ -295,13 +295,18 @@
         </div>
 
         <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
-          <span class="text-xs text-gray-400" id="tableCount">Showing all students</span>
-          <div class="flex items-center gap-1">
-            <button class="w-8 h-8 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-100 flex items-center justify-center">‹</button>
-            <button class="w-8 h-8 rounded-lg text-white text-xs font-bold" style="background:linear-gradient(135deg,#4285F4,#34A853)">1</button>
-            <button class="w-8 h-8 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-100 flex items-center justify-center">2</button>
-            <button class="w-8 h-8 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-100 flex items-center justify-center">›</button>
-          </div>
+          <span class="text-xs text-gray-400" id="tableCount">
+            @if($students instanceof \Illuminate\Pagination\Paginator || $students instanceof \Illuminate\Pagination\LengthAwarePaginator)
+              Showing {{ $students->firstItem() }}&ndash;{{ $students->lastItem() }} of {{ $students->total() }} students
+            @else
+              Showing all students
+            @endif
+          </span>
+          @if($students instanceof \Illuminate\Pagination\Paginator || $students instanceof \Illuminate\Pagination\LengthAwarePaginator)
+            <div class="pagination-links">
+              {{ $students->links('pagination::tailwind') }}
+            </div>
+          @endif
         </div>
       </div>
 
@@ -369,9 +374,7 @@
             <button class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-green-50 text-green-700 hover:bg-green-100 text-xs font-semibold transition-colors">
               <span class="text-xl">📧</span>Send Notice
             </button>
-            <button class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 text-xs font-semibold transition-colors">
-              <span class="text-xl">📊</span>View Reports
-            </button>
+            <a href="{{ route('department.reports') }}" class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 text-xs font-semibold transition-colors"><span class="text-xl">&#128202;</span>View Reports</a>
             <button class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-semibold transition-colors">
               <span class="text-xl">📋</span>Manage Courses
             </button>
@@ -439,8 +442,8 @@
       </div>
     </div>
     <div class="px-6 py-4 border-t border-gray-100 flex gap-3">
-      <button class="flex-1 py-2.5 text-sm font-semibold text-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all" style="background:linear-gradient(135deg,#4285F4,#34A853)">Send Message</button>
-      <button onclick="closeStudentModal()" class="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Close</button>
+      <button onclick="closeStudentModal()" class="flex-1 py-2.5 text-sm font-semibold text-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all" style="background:linear-gradient(135deg,#4285F4,#34A853)">Close</button>
+      <!-- <button onclick="closeStudentModal()" class="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Close</button> -->
     </div>
   </div>
 </div>
@@ -494,7 +497,7 @@ function openStudentModal(data) {
       const barColor = courseProgress >= 75 ? 'bg-green-500' : (courseProgress >= 40 ? 'bg-blue-500' : 'bg-amber-400');
       return `
         <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl">
-          <div class="text-base">\</div>
+          <div class="text-base">${course.icon || '&#128218;'}</div>
           <div class="flex-1 min-w-0">
             <p class="text-xs font-semibold text-gray-700 truncate">${course.title || 'Course'}</p>
             <div class="h-1 bg-gray-200 rounded-full mt-1 overflow-hidden"><div class="h-full rounded-full ${barColor}" style="width:${courseProgress}%"></div></div>
@@ -511,10 +514,10 @@ function openStudentModal(data) {
   setTimeout(() => pb.style.width = progress + '%', 60);
   const sb = document.getElementById('modal-status-badge');
   if (status === 'active') {
-    sb.textContent = '� Active';
+    sb.textContent = '� Active';
     sb.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200';
   } else {
-    sb.textContent = '� Inactive';
+    sb.textContent = '� Inactive';
     sb.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200';
   }
   const m = document.getElementById('studentModal');
@@ -531,7 +534,3 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStudent
 
 </body>
 </html>
-
-
-
-

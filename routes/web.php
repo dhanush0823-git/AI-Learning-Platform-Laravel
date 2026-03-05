@@ -70,4 +70,5 @@ Route::middleware('auth:student')->group(function () {
 
 Route::middleware(['auth', 'department_admin'])->group(function () {
     Route::get('/department-dashboard', [CSEDashboardController::class, 'cseDashboard'])->name('department.dashboard');
+    Route::get('/department-reports', [CSEDashboardController::class, 'reports'])->name('department.reports');
 });
