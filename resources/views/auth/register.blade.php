@@ -220,8 +220,8 @@
               </div>
             </div>
 
-            <!-- Department + Level (2 col) -->
-            <div class="grid grid-cols-2 gap-3 fade-up-3">
+            <!-- Department -->
+            <div class="grid grid-cols-1 gap-3 fade-up-3">
               <div>
                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Department</label>
                 <div class="relative">
@@ -237,24 +237,10 @@
                         {{ $department->code }}
                       </option>
                     @endforeach
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Level</label>
-                <div class="relative">
-                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                  </svg>
-                  <select name="level" id="level"
-                    class="select-focus w-full pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 bg-gray-50 cursor-pointer transition-all"
-                    required>
-                    <option value="beginner" @selected(old('level') === 'beginner')>Beginner</option>
-                    <option value="intermediate" @selected(old('level') === 'intermediate')>Intermediate</option>
-                    <option value="advanced" @selected(old('level') === 'advanced')>Advanced</option>
-                  </select>
-                </div>
-              </div>
+	                  </select>
+                    <p class="text-[11px] text-gray-400 mt-1">Learning level is assigned after diagnostic test.</p>
+	                </div>
+	              </div>
             </div>
 
             <!-- Batch -->

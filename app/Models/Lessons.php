@@ -20,4 +20,9 @@ class Lessons extends Model
     {
         return $this->belongsTo(Modules::class, 'module_id');
     }
+
+    public function progress()
+    {
+        return $this->hasMany(LessonProgress::class, 'lesson_id');
+    }
 }

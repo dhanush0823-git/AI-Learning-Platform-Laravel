@@ -8,6 +8,8 @@ use App\Http\Controllers\LearningPathController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\DiagnosticTestController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CSEDashboardController;
@@ -38,11 +40,32 @@ Route::post('/logout', [LoginController::class, 'logout'])
 // Authenticated Routes
 Route::middleware('auth:student')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/learn', [LearningPathController::class, 'index'])->name('learn');
-    Route::get('/learn/course/{id}', [LearningPathController::class, 'course'])->name('learn.course');
+    Route::get('/diagnostic-test', [DiagnosticTestController::class, 'index'])->name('diagnostic.test');
+    Route::post('/diagnostic-test', [DiagnosticTestController::class, 'submit'])->name('diagnostic.submit');
+    Route::get('/diagnostic-test/result/{attemptId}', [DiagnosticTestController::class, 'result'])->name('diagnostic.result');
+    Route::get('/learn', [LearningPathController::class, 'index'])
+        ->middleware('diagnostic.completed')
+        ->name('learn');
+    Route::get('/learn/course/{id}', [LearningPathController::class, 'course'])
+        ->middleware('diagnostic.completed')
+        ->name('learn.course');
+    Route::get('/learn/course/{courseId}/module/{moduleId}/start', [LearningPathController::class, 'startModule'])
+        ->middleware('diagnostic.completed')
+        ->name('learn.module.start');
+    Route::get('/learn/course/{courseId}/module/{moduleId}/lesson/{lessonId}', [LearningPathController::class, 'lesson'])
+        ->middleware('diagnostic.completed')
+        ->name('learn.lesson');
+    Route::post('/learn/lessons/{lessonId}/track', [LearningPathController::class, 'trackLessonTime'])
+        ->middleware('diagnostic.completed')
+        ->name('learn.lesson.track');
+    Route::post('/learn/course/{courseId}/module/{moduleId}/lesson/{lessonId}/complete', [LearningPathController::class, 'completeLesson'])
+        ->middleware('diagnostic.completed')
+        ->name('learn.lesson.complete');
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments');
     Route::post('/assessments/submit', [AssessmentController::class, 'submit'])->name('assessments.submit');
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress');
+    Route::get('/chat', [AIChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat', [AIChatController::class, 'ask'])->name('chat.ask');
 });
 
 Route::middleware(['auth', 'department_admin'])->group(function () {

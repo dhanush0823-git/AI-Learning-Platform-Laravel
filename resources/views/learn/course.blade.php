@@ -17,11 +17,22 @@
     <div style="display: grid; gap: 12px;">
         @foreach($course->modules as $module)
             <article style="background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px;">
-                <h3 style="margin: 0 0 8px;">Module {{ $module->module_number }}: {{ $module->title }}</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+                    <h3 style="margin: 0;">Module {{ $module->module_number }}: {{ $module->title }}</h3>
+                    @if($module->lessons->isNotEmpty())
+                        <a href="{{ route('learn.module.start', ['courseId' => $course->id, 'moduleId' => $module->id], false) }}" style="padding: 8px 12px; background: #2563eb; color: #fff; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;">
+                            Start
+                        </a>
+                    @endif
+                </div>
                 <ul style="margin: 0; padding-left: 18px;">
                     @foreach($module->lessons as $lesson)
                         <li style="margin-bottom: 10px;">
-                            <div>{{ $lesson->lesson_number }}. {{ $lesson->title }} ({{ $lesson->lesson_type }})</div>
+                            <div>
+                                <a href="{{ route('learn.lesson', ['courseId' => $course->id, 'moduleId' => $module->id, 'lessonId' => $lesson->id], false) }}" style="text-decoration: none; color: #1f2937;">
+                                    {{ $lesson->lesson_number }}. {{ $lesson->title }} ({{ $lesson->lesson_type }})
+                                </a>
+                            </div>
                             @if(! empty($lesson->content))
                                 <div style="margin-top: 6px; color: #374151;">
                                     {!! \Illuminate\Support\Str::markdown($lesson->content, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}

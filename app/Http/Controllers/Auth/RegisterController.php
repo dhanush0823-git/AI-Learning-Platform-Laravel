@@ -24,7 +24,6 @@ class RegisterController extends Controller
             'email' => 'required|string|email|max:255|unique:students',
             'password' => 'required|string|min:8|confirmed',
             'department_id' => 'required|exists:departments,id',
-            'level' => 'required|in:beginner,intermediate,advanced',
             'batch' => 'required|string|max:255',
         ]);
 
@@ -34,12 +33,12 @@ class RegisterController extends Controller
             'email' => $request->email,
             'department_id' => $request->department_id,
             'password' => Hash::make($request->password),
-            'level' => $request->level,
+            'level' => 'beginner',
             'batch' => $request->batch,
         ]);
 
         Auth::guard('student')->login($student);
 
-        return redirect('/dashboard');
+        return redirect()->route('home');
     }
 }

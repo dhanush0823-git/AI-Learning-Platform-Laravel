@@ -42,6 +42,11 @@ class Students extends Authenticatable
         return $this->hasMany(Assessments::class, 'student_id');
     }
 
+    public function diagnosticAttempts()
+    {
+        return $this->hasMany(DiagnosticAttempt::class, 'student_id');
+    }
+
     public function analytics()
     {
         return $this->hasOne(LearningAnalytics::class, 'student_id');

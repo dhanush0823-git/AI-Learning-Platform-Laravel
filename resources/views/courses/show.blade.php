@@ -156,6 +156,14 @@
             <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
               <span style="font-size: 14px;">📝</span>
               <span style="font-size: 13px; font-weight: 600; color: #555;">{{ $lessonCount }} lesson{{ $lessonCount !== 1 ? 's' : '' }}</span>
+              @auth('student')
+                @if($lessonCount > 0)
+                  <a href="{{ route('learn.module.start', ['courseId' => $course->id, 'moduleId' => $module->id], false) }}"
+                    style="margin-left: 8px; padding: 7px 12px; border-radius: 8px; background: #2563eb; color: #fff; text-decoration: none; font-size: 12px; font-weight: 700;">
+                    Start
+                  </a>
+                @endif
+              @endauth
             </div>
           </div>
 
@@ -168,7 +176,7 @@
                   $tc   = $typeColors[$type] ?? ['bg' => '#f1f5f9', 'color' => '#475569', 'icon' => '📄'];
                 @endphp
 
-                <a href="{{ route('courses.lessons.show', ['courseId' => $course->id, 'moduleId' => $module->id, 'lessonId' => $lesson->id], false) }}"
+                <a href="{{ auth('student')->check() ? route('learn.lesson', ['courseId' => $course->id, 'moduleId' => $module->id, 'lessonId' => $lesson->id], false) : route('courses.lessons.show', ['courseId' => $course->id, 'moduleId' => $module->id, 'lessonId' => $lesson->id], false) }}"
                   style="display: flex; align-items: center; gap: 14px; padding: 11px 22px; border-bottom: 1px solid #fafafa; transition: background .15s; text-decoration: none; color: inherit;"
                   onmouseover="this.style.background='#fafbff';"
                   onmouseout="this.style.background='';">
@@ -212,3 +220,4 @@
 </div>
 
 @endsection
+

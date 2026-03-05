@@ -27,11 +27,11 @@
         </p>
         <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
           @auth('student')
-            <a href="{{ route('dashboard') }}"
+            <a href="{{ $hasCompletedDiagnostic ? route('learn') : route('diagnostic.test') }}"
               style="padding: 15px 36px; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border-radius: 12px; font-weight: 700; font-size: 1rem; text-decoration: none; box-shadow: 0 6px 20px rgba(66,133,244,.28); display: inline-block; transition: all .2s;"
               onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 28px rgba(66,133,244,.38)';"
               onmouseout="this.style.transform=''; this.style.boxShadow='0 6px 20px rgba(66,133,244,.28)';">
-              Continue Learning →
+              {{ $hasCompletedDiagnostic ? 'Continue Learning →' : 'Diagnostic Test →' }}
             </a>
           @else
             <a href="{{ route('register') }}"

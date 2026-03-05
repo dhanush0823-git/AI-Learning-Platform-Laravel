@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Departments;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -38,13 +39,17 @@ class HomeController extends Controller
         ];
         
         $displayDepartments = Departments::whereIn('code', ['CSE', 'ECE', 'AIML', 'MECH', 'AERO'])->get();
+
+        $student = Auth::guard('student')->user();
+        $hasCompletedDiagnostic = $student ? $student->diagnosticAttempts()->exists() : false;
         
         return view('home', compact(
             'departments', 
             'courses', 
             'foundationCourses', 
             'aiFeatures',
-            'displayDepartments'
+            'displayDepartments',
+            'hasCompletedDiagnostic'
         ));
     }
 }

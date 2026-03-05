@@ -4,32 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class LessonProgress extends Model
+class DiagnosticAttempt extends Model
 {
-    protected $table = 'lesson_progress';
-
     protected $fillable = [
         'student_id',
-        'lesson_id',
-        'status',
-        'time_spent',
+        'score',
+        'total_questions',
+        'percentage',
+        'assigned_level',
+        'answers',
         'completed_at',
-        'last_accessed_at',
-        'notes',
     ];
 
     protected $casts = [
+        'answers' => 'array',
         'completed_at' => 'datetime',
-        'last_accessed_at' => 'datetime',
     ];
 
     public function student()
     {
         return $this->belongsTo(Students::class, 'student_id');
-    }
-
-    public function lesson()
-    {
-        return $this->belongsTo(Lessons::class, 'lesson_id');
     }
 }

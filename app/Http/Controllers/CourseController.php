@@ -46,6 +46,12 @@ class CourseController extends Controller
 
     public function show($id)
     {
+        if (Auth::guard('student')->check() && ! Auth::guard('student')->user()->diagnosticAttempts()->exists()) {
+            return redirect()
+                ->route('diagnostic.test')
+                ->with('warning', 'Please complete diagnostic test first.');
+        }
+
         $course = Course::with(['department', 'modules.lessons'])->findOrFail($id);
         return view('courses.show', compact('course'));
     }

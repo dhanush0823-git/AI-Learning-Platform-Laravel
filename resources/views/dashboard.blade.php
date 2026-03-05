@@ -100,13 +100,14 @@
                                             </span>
                                         </div>
                                         <p class="next-lesson">Next: {{ $course->next_lesson }}</p>
+                                        <p class="next-lesson">Time spent: {{ $course->time_spent_human }}</p>
                                     </div>
                                     <div class="course-progress">
                                         <div class="progress-bar">
                                             <div class="progress-fill" style="width: {{ $course->progress }}%"></div>
                                         </div>
                                         <span class="progress-text">{{ $course->progress }}% complete</span>
-                                        <a href="{{ route('learn.course', $course->id) }}" class="continue-btn">
+                                        <a href="{{ $course->continue_route }}" class="continue-btn">
                                             Continue →
                                         </a>
                                     </div>
