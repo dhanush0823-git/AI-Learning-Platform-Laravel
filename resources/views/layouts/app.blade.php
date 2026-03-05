@@ -31,113 +31,112 @@
       .navbar.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 
       .nav-inner {
-        /* Full width but capped */
         max-width: 1400px;
         margin: 0 auto;
-        padding: 0 16px;
-        height: 58px;
+        padding: 0 24px;
+        height: 68px;              /* taller navbar */
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 14px;
       }
 
-      /* ── Brand (fixed, don't grow) */
+      /* ── Brand */
       .nav-brand {
-        display: flex; align-items: center; gap: 9px;
+        display: flex; align-items: center; gap: 11px;
         text-decoration: none; flex-shrink: 0;
       }
       .brand-icon {
-        width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+        width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0;
         background: linear-gradient(135deg,#4285F4,#34A853);
-        display: flex; align-items: center; justify-content: center; font-size: 17px;
+        display: flex; align-items: center; justify-content: center; font-size: 20px;
       }
       .brand-text { line-height: 1; }
-      .brand-name { font-size: 13.5px; font-weight: 800; color: #1a1a1a; white-space: nowrap; }
-      .brand-sub  { font-size: 10.5px; color: #aaa; margin-top: 2px; white-space: nowrap; }
+      .brand-name { font-size: 15px; font-weight: 800; color: #1a1a1a; white-space: nowrap; }
+      .brand-sub  { font-size: 11.5px; color: #aaa; margin-top: 3px; white-space: nowrap; }
 
-      /* ── Links pill (grows to fill space, never wraps) */
+      /* ── Links pill */
       .nav-links {
-        display: flex; align-items: center; gap: 2px;
-        flex-wrap: nowrap;          /* NEVER wrap to second line */
+        display: flex; align-items: center; gap: 3px;
+        flex-wrap: nowrap;
         background: #f5f6f8; border: 1px solid #e8e9eb;
-        border-radius: 12px; padding: 4px;
+        border-radius: 14px; padding: 5px;
         flex: 1;
         min-width: 0;
-        height: 44px;              /* fixed height = single row always */
+        height: 52px;              /* taller pill */
         overflow: visible;
       }
 
       .nav-link {
-        display: flex; align-items: center; gap: 5px;
-        padding: 6px 11px;
-        border-radius: 8px;
-        font-size: 13px; font-weight: 600;
-        white-space: nowrap;       /* each link text stays on one line */
+        display: flex; align-items: center; gap: 6px;
+        padding: 7px 14px;         /* more horizontal padding */
+        border-radius: 10px;
+        font-size: 14px; font-weight: 600;  /* bigger font */
+        white-space: nowrap;
         text-decoration: none; color: #555;
         transition: background 0.15s, color 0.15s;
         flex-shrink: 0;
-        height: 34px;              /* fixed height prevents icon pushing row taller */
+        height: 40px;              /* taller link items */
         line-height: 1;
       }
       .nav-link:hover:not(.active) { background: #fff; color: #111; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
       .nav-link.active {
         background: linear-gradient(135deg,#4285F4,#34A853);
         color: #fff !important;
-        box-shadow: 0 2px 8px rgba(66,133,244,0.28);
+        box-shadow: 0 3px 10px rgba(66,133,244,0.28);
       }
 
-      .nav-icon { font-size: 14px; line-height: 1; }
+      .nav-icon { font-size: 16px; line-height: 1; }
       .nav-badge {
-        font-size: 9px; font-weight: 800;
-        padding: 2px 4px; border-radius: 4px; line-height: 1.2;
+        font-size: 10px; font-weight: 800;
+        padding: 3px 5px; border-radius: 5px; line-height: 1.2;
       }
       .badge-dt { background: #ede9fe; color: #7c3aed; }
       .badge-ai { background: #dbeafe; color: #1d4ed8; }
 
-      /* ── Right side (fixed, don't grow) */
+      /* ── Right side */
       .nav-right {
-        display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+        display: flex; align-items: center; gap: 9px; flex-shrink: 0;
       }
 
       .user-pill {
-        display: flex; align-items: center; gap: 7px;
+        display: flex; align-items: center; gap: 9px;
         background: #f5f6f8; border: 1px solid #e8e9eb;
-        border-radius: 12px; padding: 4px 9px 4px 5px;
+        border-radius: 14px; padding: 6px 12px 6px 7px;
       }
       .avatar {
-        position: relative; width: 28px; height: 28px; border-radius: 50%;
+        position: relative; width: 34px; height: 34px; border-radius: 50%;
         background: linear-gradient(135deg,#4285F4,#34A853);
         display: flex; align-items: center; justify-content: center;
-        color: #fff; font-size: 11px; font-weight: 800; flex-shrink: 0;
+        color: #fff; font-size: 13px; font-weight: 800; flex-shrink: 0;
       }
       .avatar-dot {
         position: absolute; bottom: 0; right: 0;
-        width: 7px; height: 7px; border-radius: 50%;
-        background: #34A853; border: 1.5px solid #fff;
+        width: 8px; height: 8px; border-radius: 50%;
+        background: #34A853; border: 2px solid #fff;
       }
-      .uname { font-size: 12.5px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
-      .urole { font-size: 10.5px; color: #aaa; }
+      .uname { font-size: 13.5px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+      .urole { font-size: 11px; color: #aaa; }
 
       .logout-btn {
-        font-size: 11.5px; font-weight: 600; color: #ef4444;
+        font-size: 12.5px; font-weight: 600; color: #ef4444;
         background: #fef2f2; border: 1px solid #fecaca;
-        border-radius: 7px; padding: 4px 9px; cursor: pointer;
+        border-radius: 8px; padding: 6px 12px; cursor: pointer;
         transition: background 0.15s; white-space: nowrap; font-family: inherit;
       }
       .logout-btn:hover { background: #fee2e2; }
 
       .btn-login {
-        font-size: 12.5px; font-weight: 600; color: #4285F4;
+        font-size: 13.5px; font-weight: 600; color: #4285F4;
         border: 1.5px solid #c7d8fd; background: #fff;
-        border-radius: 9px; padding: 6px 13px;
+        border-radius: 10px; padding: 8px 16px;
         text-decoration: none; transition: all 0.15s; white-space: nowrap;
       }
       .btn-login:hover { background: #eff6ff; border-color: #4285F4; }
 
       .btn-signup {
-        font-size: 12.5px; font-weight: 600; color: #fff;
+        font-size: 13.5px; font-weight: 600; color: #fff;
         background: linear-gradient(135deg,#4285F4,#34A853);
-        border-radius: 9px; padding: 6px 13px;
+        border-radius: 10px; padding: 8px 16px;
         text-decoration: none; white-space: nowrap;
         box-shadow: 0 3px 10px rgba(66,133,244,0.28);
         transition: all 0.15s;
@@ -145,7 +144,7 @@
       .btn-signup:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(66,133,244,0.38); }
 
       .hamburger {
-        display: none; width: 34px; height: 34px; border-radius: 9px;
+        display: none; width: 38px; height: 38px; border-radius: 10px;
         background: #f3f4f6; border: none; cursor: pointer;
         align-items: center; justify-content: center; flex-shrink: 0;
       }

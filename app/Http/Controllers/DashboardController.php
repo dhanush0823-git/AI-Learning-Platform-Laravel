@@ -2,7 +2,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Assessments;
 use App\Models\LessonProgress;
+use App\Models\Enrollments;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -13,18 +15,30 @@ class DashboardController extends Controller
         
         // Load relationships
         $student->load('enrolledCourses', 'assessments', 'analytics');
+
+        $enrolledCourses = $student->enrolledCourses()->with(['department', 'modules.lessons'])->get();
+        $completedCoursesCount = $enrolledCourses->filter(function ($course) {
+            $progress = (int) round((float) ($course->pivot->progress ?? 0));
+            return (bool) ($course->pivot->completed ?? false) || $progress >= 100;
+        })->count();
+        $inProgressCoursesCount = $enrolledCourses->filter(function ($course) {
+            $progress = (int) round((float) ($course->pivot->progress ?? 0));
+            return ! ((bool) ($course->pivot->completed ?? false) || $progress >= 100);
+        })->count();
+        $averageProgress = (int) round((float) $enrolledCourses->avg(fn ($course) => (float) ($course->pivot->progress ?? 0)));
         
         // Calculate stats
         $stats = (object)[
             'courses_available' => Course::count(),
-            'enrolled_courses' => $student->enrolledCourses->count(),
-            'lessons_completed' => $student->lessonProgress()->where('status', 'completed')->count(),
-            'total_progress' => $student->total_progress,
+            'enrolled_courses' => $enrolledCourses->count(),
+            'completed_courses' => $completedCoursesCount,
+            'in_progress_courses' => $inProgressCoursesCount,
+            'total_progress' => $averageProgress,
             'streak_days' => $student->streak_days
         ];
         
-        // Get enrolled courses with progress and resume pointers
-        $courses = $student->enrolledCourses()->with(['department', 'modules.lessons'])->get()->map(function($course) use ($student) {
+        // Build course cards with resume pointers
+        $courseCards = $enrolledCourses->map(function($course) use ($student) {
             $lessonIds = $course->modules
                 ->flatMap(fn ($module) => $module->lessons->pluck('id'))
                 ->values();
@@ -69,25 +83,121 @@ class DashboardController extends Controller
                 ? (int) round(($completedLessons / $lessonIds->count()) * 100)
                 : (int) ($course->pivot->progress ?? 0);
 
+            $finalProgress = max((int) ($course->pivot->progress ?? 0), $computedProgress);
+            $isCompleted = (bool) ($course->pivot->completed ?? false) || $finalProgress >= 100;
+
             return (object)[
                 'id' => $course->id,
                 'title' => $course->title,
                 'department' => $course->department->code,
                 'difficulty' => $course->difficulty,
-                'progress' => max((int) ($course->pivot->progress ?? 0), $computedProgress),
-                'next_lesson' => $targetLesson ? $targetLesson->title : 'No lessons',
+                'progress' => $finalProgress,
+                'next_lesson' => $isCompleted ? 'Course completed' : ($targetLesson ? $targetLesson->title : 'No lessons'),
                 'continue_route' => $continueRoute,
+                'review_route' => route('courses.show', $course->id),
                 'time_spent_human' => $this->formatDuration($timeSpentSeconds),
+                'is_completed' => $isCompleted,
             ];
         });
+
+        $inProgressCourses = $courseCards
+            ->filter(fn ($course) => ! $course->is_completed)
+            ->values();
+
+        $completedCourses = $courseCards
+            ->filter(fn ($course) => $course->is_completed)
+            ->values();
         
-        // Recent activity
-        $recentActivity = collect([
-            (object)['id' => 1, 'course' => 'Python Programming', 'action' => 'Completed lesson', 'time' => '2 hours ago', 'icon' => '✅'],
-            (object)['id' => 2, 'course' => 'Machine Learning', 'action' => 'Took assessment', 'time' => 'Yesterday', 'icon' => '📝'],
-            (object)['id' => 3, 'course' => 'Digital Electronics', 'action' => 'Started new module', 'time' => '2 days ago', 'icon' => '🚀']
-        ]);
-        
+        // Recent activity (dynamic)
+        $lessonActivities = LessonProgress::query()
+            ->with('lesson.module.course')
+            ->where('student_id', $student->id)
+            ->where('status', 'completed')
+            ->whereNotNull('completed_at')
+            ->latest('completed_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($progress) {
+                $courseTitle = $progress->lesson?->module?->course?->title ?? 'Course';
+
+                return (object) [
+                    'id' => 'lesson-' . $progress->id,
+                    'course' => $courseTitle,
+                    'action' => 'Completed lesson',
+                    'time' => optional($progress->completed_at)->diffForHumans() ?? 'Just now',
+                    'icon' => '✅',
+                    'timestamp' => optional($progress->completed_at)->timestamp ?? 0,
+                ];
+            });
+
+        $assessmentActivities = Assessments::query()
+            ->with('module.course')
+            ->where('student_id', $student->id)
+            ->latest('completed_at')
+            ->latest('created_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($assessment) {
+                $eventTime = $assessment->completed_at ?? $assessment->created_at;
+                $courseTitle = $assessment->module?->course?->title ?? 'Assessment';
+
+                return (object) [
+                    'id' => 'assessment-' . $assessment->id,
+                    'course' => $courseTitle,
+                    'action' => 'Took assessment',
+                    'time' => optional($eventTime)->diffForHumans() ?? 'Just now',
+                    'icon' => '📝',
+                    'timestamp' => optional($eventTime)->timestamp ?? 0,
+                ];
+            });
+
+        $enrollmentActivities = Enrollments::query()
+            ->with('course')
+            ->where('student_id', $student->id)
+            ->latest('enrolled_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($enrollment) {
+                $eventTime = $enrollment->enrolled_at ?? $enrollment->created_at;
+
+                return (object) [
+                    'id' => 'enrollment-' . $enrollment->id,
+                    'course' => $enrollment->course?->title ?? 'Course',
+                    'action' => 'Enrolled in course',
+                    'time' => optional($eventTime)->diffForHumans() ?? 'Just now',
+                    'icon' => '🚀',
+                    'timestamp' => optional($eventTime)->timestamp ?? 0,
+                ];
+            });
+
+        $courseCompletedActivities = Enrollments::query()
+            ->with('course')
+            ->where('student_id', $student->id)
+            ->whereNotNull('completed_at')
+            ->latest('completed_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($enrollment) {
+                $eventTime = $enrollment->completed_at;
+
+                return (object) [
+                    'id' => 'course-completed-' . $enrollment->id,
+                    'course' => $enrollment->course?->title ?? 'Course',
+                    'action' => 'Completed course',
+                    'time' => optional($eventTime)->diffForHumans() ?? 'Just now',
+                    'icon' => '🏁',
+                    'timestamp' => optional($eventTime)->timestamp ?? 0,
+                ];
+            });
+
+        $recentActivity = $lessonActivities
+            ->concat($assessmentActivities)
+            ->concat($enrollmentActivities)
+            ->concat($courseCompletedActivities)
+            ->sortByDesc('timestamp')
+            ->take(5)
+            ->values();
+
         // Recommendations
         $recommendations = Course::where('difficulty', $student->level)
             ->whereNotIn('id', $student->enrolledCourses->pluck('id'))
@@ -114,7 +224,8 @@ class DashboardController extends Controller
         
         $dashboardData = (object)[
             'stats' => $stats,
-            'courses' => $courses,
+            'in_progress_courses' => $inProgressCourses,
+            'completed_courses' => $completedCourses,
             'recent_activity' => $recentActivity,
             'recommendations' => $recommendations,
             'heatmap' => $heatmap,

@@ -45,8 +45,9 @@
             <div class="stat-card" style="background: linear-gradient(135deg, #FF9800 0%, #FF5722 100%)">
                 <div class="stat-icon">🎯</div>
                 <div class="stat-content">
-                    <h3>Lessons Completed</h3>
-                    <p class="stat-number">{{ $dashboardData->stats->lessons_completed }}</p>
+                    <h3>Courses Completed</h3>
+                    <p class="stat-number">{{ $dashboardData->stats->completed_courses }}</p>
+                    <p style="margin: 4px 0 0; opacity: .9; font-size: .9rem;">In Progress: {{ $dashboardData->stats->in_progress_courses }}</p>
                 </div>
             </div>
             
@@ -87,41 +88,89 @@
                             </a>
                         </div>
                         
-                        @if($dashboardData->courses->isNotEmpty())
-                            <div class="courses-list">
-                                @foreach($dashboardData->courses as $course)
-                                <div class="course-item">
-                                    <div class="course-info">
-                                        <h3>{{ $course->title }}</h3>
-                                        <div class="course-meta">
-                                            <span class="department-badge">{{ $course->department }}</span>
-                                            <span class="difficulty-badge {{ $course->difficulty }}">
-                                                {{ $course->difficulty }}
-                                            </span>
+                        <div x-data="{ courseView: 'in_progress' }">
+                            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                                <button class="tab" :class="{ 'active': courseView === 'in_progress' }" @click="courseView = 'in_progress'">
+                                    In Progress ({{ $dashboardData->in_progress_courses->count() }})
+                                </button>
+                                <button class="tab" :class="{ 'active': courseView === 'completed' }" @click="courseView = 'completed'">
+                                    Completed ({{ $dashboardData->completed_courses->count() }})
+                                </button>
+                            </div>
+
+                            <div x-show="courseView === 'in_progress'">
+                                @if($dashboardData->in_progress_courses->isNotEmpty())
+                                    <div class="courses-list">
+                                        @foreach($dashboardData->in_progress_courses as $course)
+                                        <div class="course-item">
+                                            <div class="course-info">
+                                                <h3>{{ $course->title }}</h3>
+                                                <div class="course-meta">
+                                                    <span class="department-badge">{{ $course->department }}</span>
+                                                    <span class="difficulty-badge {{ $course->difficulty }}">
+                                                        {{ $course->difficulty }}
+                                                    </span>
+                                                </div>
+                                                <p class="next-lesson">Next: {{ $course->next_lesson }}</p>
+                                                <p class="next-lesson">Time spent: {{ $course->time_spent_human }}</p>
+                                            </div>
+                                            <div class="course-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: {{ $course->progress }}%"></div>
+                                                </div>
+                                                <span class="progress-text">{{ $course->progress }}% complete</span>
+                                                <a href="{{ $course->continue_route }}" class="continue-btn">
+                                                    Continue ->
+                                                </a>
+                                            </div>
                                         </div>
-                                        <p class="next-lesson">Next: {{ $course->next_lesson }}</p>
-                                        <p class="next-lesson">Time spent: {{ $course->time_spent_human }}</p>
+                                        @endforeach
                                     </div>
-                                    <div class="course-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{ $course->progress }}%"></div>
-                                        </div>
-                                        <span class="progress-text">{{ $course->progress }}% complete</span>
-                                        <a href="{{ $course->continue_route }}" class="continue-btn">
-                                            Continue →
+                                @else
+                                    <div class="empty-state">
+                                        <p>No in-progress courses right now.</p>
+                                        <a href="{{ route('courses') }}" class="browse-btn">
+                                            Browse Courses
                                         </a>
                                     </div>
-                                </div>
-                                @endforeach
+                                @endif
                             </div>
-                        @else
-                            <div class="empty-state">
-                                <p>No courses enrolled yet.</p>
-                                <a href="{{ route('courses') }}" class="browse-btn">
-                                    Browse Courses
-                                </a>
+
+                            <div x-show="courseView === 'completed'" x-cloak>
+                                @if($dashboardData->completed_courses->isNotEmpty())
+                                    <div class="courses-list">
+                                        @foreach($dashboardData->completed_courses as $course)
+                                        <div class="course-item">
+                                            <div class="course-info">
+                                                <h3>{{ $course->title }}</h3>
+                                                <div class="course-meta">
+                                                    <span class="department-badge">{{ $course->department }}</span>
+                                                    <span class="difficulty-badge {{ $course->difficulty }}">
+                                                        {{ $course->difficulty }}
+                                                    </span>
+                                                </div>
+                                                <p class="next-lesson">Status: Completed</p>
+                                                <p class="next-lesson">Time spent: {{ $course->time_spent_human }}</p>
+                                            </div>
+                                            <div class="course-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: 100%"></div>
+                                                </div>
+                                                <span class="progress-text">100% complete</span>
+                                                <a href="{{ $course->review_route }}" class="continue-btn">
+                                                    Review
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="empty-state">
+                                        <p>No completed courses yet.</p>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
+                        </div>
                     </div>
 
                     <!-- Recent Activity -->

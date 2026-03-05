@@ -109,7 +109,7 @@
           <span class="text-xs font-semibold text-rose-500 bg-white border border-rose-200 px-2 py-0.5 rounded-full">+28</span>
         </div>
         <div>
-          <div class="text-2xl font-extrabold text-rose-700">342</div>
+          <div class="text-2xl font-extrabold text-rose-700">{{ $totalAssessments }}</div>
           <div class="text-xs text-gray-500 font-medium mt-0.5">Assessments Done</div>
         </div>
       </div>
@@ -222,7 +222,7 @@
                       @endif
                     </td>
                     <td class="px-5 py-3.5">
-                      <button onclick="openStudentModal('{{ $s[0] }}','{{ $s[1] }}','{{ $s[2] }}',{{ $s[3] }},'{{ $s[4] }}')"
+                      <button onclick='openStudentModal({name: @json($s[0]), email: @json($s[1]), dept: @json($s[2]), progress: {{ $s[3] }}, status: @json($s[4]), courses: {{ $s[5] }}, completed: {{ max(0, (int) round($s[5] * $s[3] / 100)) }}, certificates: {{ max(0, (int) round($s[5] * $s[3] / 100)) }}, recent_courses: []})'
                         class="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
                         View
                       </button>
@@ -275,7 +275,7 @@
                       @endif
                     </td>
                     <td class="px-5 py-3.5">
-                      <button onclick="openStudentModal('{{ $student->name }}','{{ $student->email }}','{{ $student->department->code ?? '' }}',{{ $pg }},'{{ $status }}')"
+                      <button onclick='openStudentModal(@json($student->modal_data ?? []))'
                         class="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
                         View
                       </button>
@@ -338,32 +338,24 @@
 
         <!-- Top Performers -->
         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-          <h3 class="text-sm font-bold text-gray-900 mb-4">🏆 Top Performers</h3>
+          <h3 class="text-sm font-bold text-gray-900 mb-4">Top Performers</h3>
           <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-bold text-gray-300 w-4">#1</span>
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">AN</div>
-              <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-gray-800 leading-none truncate">Ananya Iyer</p><p class="text-xs text-gray-400">AIML</p></div>
-              <span class="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">95%</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-bold text-gray-300 w-4">#2</span>
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">AR</div>
-              <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-gray-800 leading-none truncate">Arjun Sharma</p><p class="text-xs text-gray-400">CSE</p></div>
-              <span class="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">92%</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-bold text-gray-300 w-4">#3</span>
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">KA</div>
-              <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-gray-800 leading-none truncate">Kavya Menon</p><p class="text-xs text-gray-400">AIML</p></div>
-              <span class="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">88%</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-bold text-gray-300 w-4">#4</span>
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">SN</div>
-              <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-gray-800 leading-none truncate">Sneha Reddy</p><p class="text-xs text-gray-400">CSE</p></div>
-              <span class="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">81%</span>
-            </div>
+            @forelse($topPerformers as $performer)
+              @php
+                $avatarColors = ['from-purple-400 to-purple-600','from-blue-400 to-blue-600','from-cyan-400 to-cyan-600','from-rose-400 to-rose-600'];
+                $ac = $avatarColors[$loop->index % count($avatarColors)];
+              @endphp
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-bold text-gray-300 w-4">#{{ $loop->iteration }}</span>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br {{ $ac }} flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  {{ strtoupper(substr($performer->name ?? 'S', 0, 2)) }}
+                </div>
+                <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-gray-800 leading-none truncate">{{ $performer->name }}</p><p class="text-xs text-gray-400">{{ $performer->department->code ?? 'N/A' }}</p></div>
+                <span class="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">{{ (int) ($performer->progress ?? 0) }}%</span>
+              </div>
+            @empty
+              <p class="text-xs text-gray-400">No student performance data available.</p>
+            @endforelse
           </div>
         </div>
 
@@ -390,26 +382,14 @@
         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
           <h3 class="text-sm font-bold text-gray-900 mb-4">Recent Activity</h3>
           <div class="space-y-3">
-            <div class="flex items-start gap-2.5">
-              <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-green-400"></span>
-              <div><p class="text-xs text-gray-700 leading-snug">Arjun completed Python Basics</p><p class="text-xs text-gray-400 mt-0.5">2m ago</p></div>
-            </div>
-            <div class="flex items-start gap-2.5">
-              <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-blue-400"></span>
-              <div><p class="text-xs text-gray-700 leading-snug">Priya enrolled in Digital Electronics</p><p class="text-xs text-gray-400 mt-0.5">15m ago</p></div>
-            </div>
-            <div class="flex items-start gap-2.5">
-              <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-amber-400"></span>
-              <div><p class="text-xs text-gray-700 leading-snug">Rahul submitted DSA assignment</p><p class="text-xs text-gray-400 mt-0.5">1h ago</p></div>
-            </div>
-            <div class="flex items-start gap-2.5">
-              <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-purple-400"></span>
-              <div><p class="text-xs text-gray-700 leading-snug">Ananya scored 98% in AI quiz</p><p class="text-xs text-gray-400 mt-0.5">3h ago</p></div>
-            </div>
-            <div class="flex items-start gap-2.5">
-              <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-gray-400"></span>
-              <div><p class="text-xs text-gray-700 leading-snug">New student registered: Dev K.</p><p class="text-xs text-gray-400 mt-0.5">5h ago</p></div>
-            </div>
+            @forelse($recentDepartmentActivity as $activity)
+              <div class="flex items-start gap-2.5">
+                <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 {{ $activity->dot ?? 'bg-gray-400' }}"></span>
+                <div><p class="text-xs text-gray-700 leading-snug">{{ $activity->message }}</p><p class="text-xs text-gray-400 mt-0.5">{{ $activity->time }}</p></div>
+              </div>
+            @empty
+              <p class="text-xs text-gray-400">No recent activity found.</p>
+            @endforelse
           </div>
         </div>
 
@@ -449,38 +429,13 @@
         </div>
       </div>
       <div class="grid grid-cols-3 gap-3">
-        <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="text-lg">📚</div><div class="text-lg font-extrabold text-gray-800 mt-1">5</div><div class="text-xs text-gray-400">Courses</div></div>
-        <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="text-lg">✅</div><div class="text-lg font-extrabold text-gray-800 mt-1">3</div><div class="text-xs text-gray-400">Completed</div></div>
-        <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="text-lg">🏅</div><div class="text-lg font-extrabold text-gray-800 mt-1">2</div><div class="text-xs text-gray-400">Certificates</div></div>
+        <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="text-lg">&#128218;</div><div id="modal-courses-count" class="text-lg font-extrabold text-gray-800 mt-1">0</div><div class="text-xs text-gray-400">Courses</div></div>
+        <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="text-lg">&#9989;</div><div id="modal-completed-count" class="text-lg font-extrabold text-gray-800 mt-1">0</div><div class="text-xs text-gray-400">Completed</div></div>
+        <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="text-lg">&#127941;</div><div id="modal-certificates-count" class="text-lg font-extrabold text-gray-800 mt-1">0</div><div class="text-xs text-gray-400">Certificates</div></div>
       </div>
       <div>
         <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Recent Courses</p>
-        <div class="space-y-2">
-          <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl">
-            <div class="text-base">💻</div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-semibold text-gray-700 truncate">Python Programming Basics</p>
-              <div class="h-1 bg-gray-200 rounded-full mt-1 overflow-hidden"><div class="h-full rounded-full bg-green-500" style="width:88%"></div></div>
-            </div>
-            <span class="text-xs font-bold text-gray-500">88%</span>
-          </div>
-          <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl">
-            <div class="text-base">🤖</div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-semibold text-gray-700 truncate">Introduction to AI</p>
-              <div class="h-1 bg-gray-200 rounded-full mt-1 overflow-hidden"><div class="h-full rounded-full bg-blue-500" style="width:62%"></div></div>
-            </div>
-            <span class="text-xs font-bold text-gray-500">62%</span>
-          </div>
-          <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl">
-            <div class="text-base">📊</div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-semibold text-gray-700 truncate">Data Structures & Algorithms</p>
-              <div class="h-1 bg-gray-200 rounded-full mt-1 overflow-hidden"><div class="h-full rounded-full bg-amber-400" style="width:45%"></div></div>
-            </div>
-            <span class="text-xs font-bold text-gray-500">45%</span>
-          </div>
-        </div>
+        <div id="modal-recent-courses" class="space-y-2"></div>
       </div>
     </div>
     <div class="px-6 py-4 border-t border-gray-100 flex gap-3">
@@ -511,21 +466,55 @@ document.getElementById('globalSearch')?.addEventListener('input', filterTable);
 document.getElementById('deptFilter')?.addEventListener('change', filterTable);
 document.getElementById('statusFilter')?.addEventListener('change', filterTable);
 
-function openStudentModal(name, email, dept, progress, status) {
+function openStudentModal(data) {
+  const name = data?.name || 'Student';
+  const email = data?.email || '';
+  const dept = data?.dept || 'N/A';
+  const progress = Number(data?.progress || 0);
+  const status = data?.status || 'inactive';
+  const courses = Number(data?.courses || 0);
+  const completed = Number(data?.completed || 0);
+  const certificates = Number(data?.certificates || 0);
+  const recentCourses = Array.isArray(data?.recent_courses) ? data.recent_courses : [];
+
   document.getElementById('modal-avatar').textContent = name.slice(0,2).toUpperCase();
-  document.getElementById('modal-name').textContent   = name;
-  document.getElementById('modal-email').textContent  = email;
-  document.getElementById('modal-dept').textContent   = dept;
+  document.getElementById('modal-name').textContent = name;
+  document.getElementById('modal-email').textContent = email;
+  document.getElementById('modal-dept').textContent = dept;
+  document.getElementById('modal-courses-count').textContent = String(courses);
+  document.getElementById('modal-completed-count').textContent = String(completed);
+  document.getElementById('modal-certificates-count').textContent = String(certificates);
+
+  const recentCoursesEl = document.getElementById('modal-recent-courses');
+  if (recentCourses.length === 0) {
+    recentCoursesEl.innerHTML = '<p class="text-xs text-gray-400">No recent course data.</p>';
+  } else {
+    recentCoursesEl.innerHTML = recentCourses.map((course) => {
+      const courseProgress = Number(course.progress || 0);
+      const barColor = courseProgress >= 75 ? 'bg-green-500' : (courseProgress >= 40 ? 'bg-blue-500' : 'bg-amber-400');
+      return `
+        <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl">
+          <div class="text-base">\</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-semibold text-gray-700 truncate">${course.title || 'Course'}</p>
+            <div class="h-1 bg-gray-200 rounded-full mt-1 overflow-hidden"><div class="h-full rounded-full ${barColor}" style="width:${courseProgress}%"></div></div>
+          </div>
+          <span class="text-xs font-bold text-gray-500">${courseProgress}%</span>
+        </div>
+      `;
+    }).join('');
+  }
+
   const pb = document.getElementById('modal-progress-bar');
   document.getElementById('modal-progress-text').textContent = progress + '%';
   pb.style.width = '0%';
   setTimeout(() => pb.style.width = progress + '%', 60);
   const sb = document.getElementById('modal-status-badge');
   if (status === 'active') {
-    sb.textContent = '● Active';
+    sb.textContent = '� Active';
     sb.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200';
   } else {
-    sb.textContent = '● Inactive';
+    sb.textContent = '� Inactive';
     sb.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200';
   }
   const m = document.getElementById('studentModal');
@@ -542,3 +531,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStudent
 
 </body>
 </html>
+
+
+
+
