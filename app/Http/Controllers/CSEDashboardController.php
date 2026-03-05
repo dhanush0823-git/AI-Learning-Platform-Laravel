@@ -92,7 +92,7 @@ class CSEDashboardController extends Controller
 
         // prepare paginator with 10 per page
         $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 1;
+        $perPage = 10;
         $paginatedStudents = new \Illuminate\Pagination\LengthAwarePaginator(
             $students->forPage($currentPage, $perPage)->values(),
             $students->count(),

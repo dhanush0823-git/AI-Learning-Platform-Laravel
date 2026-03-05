@@ -207,6 +207,96 @@
       .f-bottom-right { display: flex; gap: 16px; }
       @media (max-width: 900px)  { .footer-grid { grid-template-columns: 1fr 1fr; } }
       @media (max-width: 520px)  { .footer-grid { grid-template-columns: 1fr; } .f-bottom { flex-direction: column; text-align: center; } }
+
+      /* Pagination (global) */
+      nav[aria-label="Pagination Navigation"],
+      .pagination-links nav {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      .pagination-links span,
+      .pagination-links nav span,
+      nav[aria-label="Pagination Navigation"] span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      nav[aria-label="Pagination Navigation"] button,
+      nav[aria-label="Pagination Navigation"] a,
+      nav[aria-label="Pagination Navigation"] span > span,
+      .pagination-links a,
+      .pagination-links button,
+      .pagination-links span > span {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 34px !important;
+        height: 34px !important;
+        padding: 0 10px !important;
+        border-radius: 10px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        border: 1px solid #e8e9eb !important;
+        background: #fff !important;
+        color: #555 !important;
+        text-decoration: none !important;
+        transition: all 0.15s ease !important;
+        cursor: pointer !important;
+        line-height: 1 !important;
+      }
+      nav[aria-label="Pagination Navigation"] button:hover,
+      nav[aria-label="Pagination Navigation"] a:hover,
+      .pagination-links a:hover,
+      .pagination-links button:hover {
+        background: #eff6ff !important;
+        border-color: #bfdbfe !important;
+        color: #4285f4 !important;
+      }
+      nav[aria-label="Pagination Navigation"] button[aria-current="page"],
+      nav[aria-label="Pagination Navigation"] span[aria-current="page"] span,
+      .pagination-links span[aria-current="page"] span {
+        background: linear-gradient(135deg, #4285f4, #34a853) !important;
+        border-color: transparent !important;
+        color: #fff !important;
+        box-shadow: 0 3px 10px rgba(66, 133, 244, 0.3) !important;
+      }
+      nav[aria-label="Pagination Navigation"] span > span:not([aria-current]),
+      .pagination-links span > span:not([aria-current]) {
+        background: #f9fafb !important;
+        color: #9ca3af !important;
+        cursor: default !important;
+        border-color: #f0f0f0 !important;
+      }
+      nav[aria-label="Pagination Navigation"] button:first-child,
+      nav[aria-label="Pagination Navigation"] button:last-child,
+      .pagination-links button:first-child,
+      .pagination-links button:last-child,
+      nav[aria-label="Pagination Navigation"] a[rel="prev"],
+      nav[aria-label="Pagination Navigation"] a[rel="next"],
+      .pagination-links a[rel="prev"],
+      .pagination-links a[rel="next"] {
+        background: #f5f6f8 !important;
+        border-color: #e8e9eb !important;
+        color: #4285f4 !important;
+        font-weight: 700 !important;
+      }
+      nav[aria-label="Pagination Navigation"] a[rel="prev"]:hover,
+      nav[aria-label="Pagination Navigation"] a[rel="next"]:hover,
+      .pagination-links a[rel="prev"]:hover,
+      .pagination-links a[rel="next"]:hover {
+        background: #eff6ff !important;
+        border-color: #4285f4 !important;
+      }
+      nav[aria-label="Pagination Navigation"] button:disabled,
+      .pagination-links button:disabled {
+        opacity: 0.4 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+      }
+      nav[aria-label="Pagination Navigation"] > p.text-sm { display: none !important; }
+      nav[aria-label="Pagination Navigation"] p.text-sm { display: none !important; }
+      nav[aria-label="Pagination Navigation"] .hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between > div:first-child { display: none !important; }
     </style>
 
     @stack('styles')
@@ -366,3 +456,4 @@
   @stack('scripts')
 </body>
 </html>
+

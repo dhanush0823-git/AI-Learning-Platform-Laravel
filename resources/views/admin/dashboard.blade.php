@@ -18,6 +18,48 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="shortcut icon" href="{{ asset('assets/favicon.png') }}" type="image/x-icon">
+<style>
+  nav[aria-label="Pagination Navigation"],
+  .pagination-links nav { display:flex; align-items:center; justify-content:flex-end; }
+  .pagination-links span,
+  .pagination-links nav span,
+  nav[aria-label="Pagination Navigation"] span { display:flex; align-items:center; gap:4px; }
+  nav[aria-label="Pagination Navigation"] button,
+  nav[aria-label="Pagination Navigation"] a,
+  nav[aria-label="Pagination Navigation"] span > span,
+  .pagination-links a,
+  .pagination-links button,
+  .pagination-links span > span {
+    display:inline-flex !important; align-items:center !important; justify-content:center !important;
+    min-width:34px !important; height:34px !important; padding:0 10px !important; border-radius:10px !important;
+    font-size:13px !important; font-weight:600 !important; border:1px solid #e8e9eb !important;
+    background:#fff !important; color:#555 !important; text-decoration:none !important; transition:all .15s ease !important;
+    cursor:pointer !important; line-height:1 !important;
+  }
+  nav[aria-label="Pagination Navigation"] button:hover,
+  nav[aria-label="Pagination Navigation"] a:hover,
+  .pagination-links a:hover,
+  .pagination-links button:hover { background:#eff6ff !important; border-color:#bfdbfe !important; color:#4285f4 !important; }
+  nav[aria-label="Pagination Navigation"] button[aria-current="page"],
+  nav[aria-label="Pagination Navigation"] span[aria-current="page"] span,
+  .pagination-links span[aria-current="page"] span {
+    background:linear-gradient(135deg,#4285f4,#34a853) !important; border-color:transparent !important; color:#fff !important;
+    box-shadow:0 3px 10px rgba(66,133,244,.3) !important;
+  }
+  nav[aria-label="Pagination Navigation"] span > span:not([aria-current]),
+  .pagination-links span > span:not([aria-current]) { background:#f9fafb !important; color:#9ca3af !important; cursor:default !important; border-color:#f0f0f0 !important; }
+  nav[aria-label="Pagination Navigation"] button:first-child,
+  nav[aria-label="Pagination Navigation"] button:last-child,
+  .pagination-links button:first-child,
+  .pagination-links button:last-child,
+  nav[aria-label="Pagination Navigation"] a[rel="prev"],
+  nav[aria-label="Pagination Navigation"] a[rel="next"],
+  .pagination-links a[rel="prev"],
+  .pagination-links a[rel="next"] { background:#f5f6f8 !important; border-color:#e8e9eb !important; color:#4285f4 !important; font-weight:700 !important; }
+  nav[aria-label="Pagination Navigation"] > p.text-sm { display:none !important; }
+  nav[aria-label="Pagination Navigation"] p.text-sm { display:none !important; }
+  nav[aria-label="Pagination Navigation"] .hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between > div:first-child { display:none !important; }
+</style>
 
 <div class="min-h-screen bg-gray-50" style="font-family: Inter, system-ui, sans-serif;">
 
@@ -296,15 +338,33 @@
 
         <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
           <span class="text-xs text-gray-400" id="tableCount">
-            @if($students instanceof \Illuminate\Pagination\Paginator || $students instanceof \Illuminate\Pagination\LengthAwarePaginator)
+            @if($students instanceof \Illuminate\Pagination\LengthAwarePaginator && $students->total() > 0)
               Showing {{ $students->firstItem() }}&ndash;{{ $students->lastItem() }} of {{ $students->total() }} students
             @else
               Showing all students
             @endif
           </span>
-          @if($students instanceof \Illuminate\Pagination\Paginator || $students instanceof \Illuminate\Pagination\LengthAwarePaginator)
-            <div class="pagination-links">
-              {{ $students->links('pagination::tailwind') }}
+          @if($students instanceof \Illuminate\Pagination\LengthAwarePaginator && $students->lastPage() > 1)
+            <div class="flex items-center gap-1">
+              @if($students->onFirstPage())
+                <span class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed">‹</span>
+              @else
+                <a href="{{ $students->previousPageUrl() }}" class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition-colors">‹</a>
+              @endif
+
+              @foreach($students->getUrlRange(1, $students->lastPage()) as $page => $url)
+                @if($page == $students->currentPage())
+                  <span class="w-10 h-10 rounded-xl text-white text-sm font-bold flex items-center justify-center shadow-sm" style="background:linear-gradient(135deg,#4285F4,#34A853)">{{ $page }}</span>
+                @else
+                  <a href="{{ $url }}" class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 text-sm font-semibold flex items-center justify-center transition-colors">{{ $page }}</a>
+                @endif
+              @endforeach
+
+              @if($students->hasMorePages())
+                <a href="{{ $students->nextPageUrl() }}" class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition-colors">›</a>
+              @else
+                <span class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed">›</span>
+              @endif
             </div>
           @endif
         </div>
