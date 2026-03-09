@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assessments;
+use App\Models\AssessmentAttemptAnswer;
 use App\Models\Course;
 use App\Models\Departments;
 use App\Models\Enrollments;
@@ -118,6 +119,19 @@ class CSEDashboardController extends Controller
                 ->whereHas('student', fn ($q) => $q->where('department_id', $departmentId))
                 ->count()
             : 0;
+        $adaptiveAssessments = $departmentId
+            ? Assessments::query()
+                ->where('department_id', $departmentId)
+                ->where('is_adaptive', true)
+                ->count()
+            : 0;
+        $adaptiveAveragePercentage = $departmentId
+            ? round((float) Assessments::query()
+                ->where('department_id', $departmentId)
+                ->where('is_adaptive', true)
+                ->selectRaw('AVG(CASE WHEN total_questions > 0 THEN (score / total_questions) * 100 ELSE 0 END) as avg_pct')
+                ->value('avg_pct'))
+            : 0;
 
         $topPerformers = $allStudents
             ->sortByDesc('progress')
@@ -192,6 +206,28 @@ class CSEDashboardController extends Controller
             ->take(5)
             ->values();
 
+        $assessmentDifficultyDistribution = $departmentId
+            ? Assessments::query()
+                ->where('department_id', $departmentId)
+                ->where('is_adaptive', true)
+                ->selectRaw('current_difficulty as difficulty, COUNT(*) as total')
+                ->groupBy('current_difficulty')
+                ->orderBy('current_difficulty')
+                ->get()
+            : collect();
+
+        $weakTopics = $departmentId
+            ? AssessmentAttemptAnswer::query()
+                ->join('assessments', 'assessments.id', '=', 'assessment_attempt_answers.assessment_id')
+                ->join('questions', 'questions.id', '=', 'assessment_attempt_answers.question_id')
+                ->where('assessments.department_id', $departmentId)
+                ->selectRaw('questions.topic as topic, AVG(CASE WHEN assessment_attempt_answers.is_correct = 1 THEN 100 ELSE 0 END) as accuracy')
+                ->groupBy('questions.topic')
+                ->orderBy('accuracy')
+                ->limit(5)
+                ->get()
+            : collect();
+
         return view('admin.dashboard', compact(
             'admin',
             'department',
@@ -200,8 +236,12 @@ class CSEDashboardController extends Controller
             'totalCourses',
             'avgProgress',
             'totalAssessments',
+            'adaptiveAssessments',
+            'adaptiveAveragePercentage',
             'topPerformers',
             'recentDepartmentActivity',
+            'assessmentDifficultyDistribution',
+            'weakTopics',
         ));
     }
 

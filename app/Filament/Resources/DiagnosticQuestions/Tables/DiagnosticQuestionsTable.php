@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DiagnosticQuestions\Tables;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class DiagnosticQuestionsTable
@@ -33,6 +34,13 @@ class DiagnosticQuestionsTable
             ])
             ->recordActions([
                 EditAction::make(),
+            ])
+            ->filters([
+                SelectFilter::make('department_id')
+                    ->label('Department')
+                    ->relationship('department', 'name')
+                    ->searchable()
+                    ->preload(),
             ]);
     }
 }

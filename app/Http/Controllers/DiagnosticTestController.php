@@ -19,14 +19,12 @@ class DiagnosticTestController extends Controller
             ->where('department_id', $student->department_id)
             ->where('is_active', true)
             ->inRandomOrder()
-            ->limit(10)
             ->get();
 
         if ($questions->isEmpty()) {
             $questions = DiagnosticQuestion::query()
                 ->where('is_active', true)
                 ->inRandomOrder()
-                ->limit(10)
                 ->get();
         }
 

@@ -153,6 +153,9 @@
         <div>
           <div class="text-2xl font-extrabold text-rose-700">{{ $totalAssessments }}</div>
           <div class="text-xs text-gray-500 font-medium mt-0.5">Assessments Done</div>
+          <div class="text-xs text-gray-400 mt-1">
+            Adaptive: {{ $adaptiveAssessments ?? 0 }} • Avg: {{ $adaptiveAveragePercentage ?? 0 }}%
+          </div>
         </div>
       </div>
     </div>
@@ -438,6 +441,45 @@
             <button class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-semibold transition-colors">
               <span class="text-xl">📋</span>Manage Courses
             </button>
+          </div>
+        </div>
+
+        <!-- Assessment Insights -->
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+          <h3 class="text-sm font-bold text-gray-900 mb-4">Assessment Insights</h3>
+          <div class="space-y-3">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 mb-2">Difficulty Distribution</p>
+              @forelse(($assessmentDifficultyDistribution ?? collect()) as $row)
+                @php
+                  $rowTotal = max(1, (int) ($adaptiveAssessments ?? 0));
+                  $width = min(100, (int) round(($row->total / $rowTotal) * 100));
+                @endphp
+                <div class="mb-2">
+                  <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+                    <span>Level {{ $row->difficulty }}</span>
+                    <span>{{ $row->total }}</span>
+                  </div>
+                  <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-500 rounded-full" style="width:{{ $width }}%"></div>
+                  </div>
+                </div>
+              @empty
+                <p class="text-xs text-gray-400">No adaptive assessment data yet.</p>
+              @endforelse
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold text-gray-500 mb-2">Weak Topics</p>
+              @forelse(($weakTopics ?? collect()) as $topic)
+                <div class="flex items-center justify-between text-xs py-1 border-b border-gray-100 last:border-b-0">
+                  <span class="font-semibold text-gray-700 truncate pr-2">{{ $topic->topic }}</span>
+                  <span class="text-rose-600">{{ round($topic->accuracy) }}%</span>
+                </div>
+              @empty
+                <p class="text-xs text-gray-400">No weak-topic trend available.</p>
+              @endforelse
+            </div>
           </div>
         </div>
 

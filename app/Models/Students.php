@@ -52,6 +52,11 @@ class Students extends Authenticatable
         return $this->hasOne(LearningAnalytics::class, 'student_id');
     }
 
+    public function skillProfiles()
+    {
+        return $this->hasMany(StudentSkillProfile::class, 'student_id');
+    }
+
     public function enrolledCourses()
     {
         return $this->belongsToMany(Course::class, 'enrollments', 'student_id', 'course_id')

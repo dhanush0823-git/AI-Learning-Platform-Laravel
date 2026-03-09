@@ -10,6 +10,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\DiagnosticTestController;
+use App\Http\Controllers\AdaptiveAssessmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CSEDashboardController;
@@ -26,7 +27,7 @@ Route::get('/privacy', function () { return view('privacy'); })->name('privacy')
 Route::get('/terms', function () { return view('terms'); })->name('terms');
 
 // Guest Routes
-Route::middleware(['guest', 'guest:student'])->group(function () {
+Route::middleware(['guest:student'])->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -63,6 +64,12 @@ Route::middleware('auth:student')->group(function () {
         ->name('learn.lesson.complete');
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments');
     Route::post('/assessments/submit', [AssessmentController::class, 'submit'])->name('assessments.submit');
+    Route::post('/assessments/adaptive/start', [AdaptiveAssessmentController::class, 'start'])->name('assessments.adaptive.start');
+    Route::get('/assessments/adaptive/{assessment}', [AdaptiveAssessmentController::class, 'take'])->name('assessments.adaptive.take');
+    Route::get('/assessments/adaptive/{assessment}/next', [AdaptiveAssessmentController::class, 'nextQuestion'])->name('assessments.adaptive.next');
+    Route::post('/assessments/adaptive/{assessment}/answer', [AdaptiveAssessmentController::class, 'submitAnswer'])->name('assessments.adaptive.answer');
+    Route::post('/assessments/adaptive/{assessment}/finish', [AdaptiveAssessmentController::class, 'finish'])->name('assessments.adaptive.finish');
+    Route::get('/assessments/adaptive/{assessment}/result', [AdaptiveAssessmentController::class, 'result'])->name('assessments.adaptive.result');
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress');
     Route::get('/chat', [AIChatController::class, 'index'])->name('chat.index');
     Route::post('/chat', [AIChatController::class, 'ask'])->name('chat.ask');

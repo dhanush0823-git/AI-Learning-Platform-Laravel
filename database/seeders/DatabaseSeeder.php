@@ -132,5 +132,7 @@ class DatabaseSeeder extends Seeder
             'streak_days' => 7,
             'total_progress' => 45
         ]);
+
+        $this->call(DepartmentDiagnosticQuestionSeeder::class);
     }
 }
