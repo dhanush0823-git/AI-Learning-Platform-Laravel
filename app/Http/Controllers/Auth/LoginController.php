@@ -30,6 +30,8 @@ class LoginController extends Controller
 
         if ($validated['role'] === 'student' && Auth::guard('student')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
+            $student = Auth::guard('student')->user();
+            $request->session()->put('student_department_id', $student?->department_id);
             return redirect()->intended(route('home'));
         }
 
