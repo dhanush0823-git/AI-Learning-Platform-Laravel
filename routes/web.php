@@ -78,4 +78,10 @@ Route::middleware('auth:student')->group(function () {
 Route::middleware(['auth', 'department_admin'])->group(function () {
     Route::get('/department-dashboard', [CSEDashboardController::class, 'cseDashboard'])->name('department.dashboard');
     Route::get('/department-reports', [CSEDashboardController::class, 'reports'])->name('department.reports');
+    Route::get('/department-reports/student/{student}', [CSEDashboardController::class, 'studentReport'])->name('department.reports.student');
+    Route::get('/department-reports/course/{course}/marks', [CSEDashboardController::class, 'courseModuleMarks'])->name('department.reports.course.marks');
+});
+
+Route::middleware('auth:student')->group(function () {
+    Route::get('/learn/course/{courseId}/module/{moduleId}/module-test', [AdaptiveAssessmentController::class, 'startModule'])->name('assessments.module.start');
 });

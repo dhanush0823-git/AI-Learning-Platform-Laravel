@@ -210,8 +210,7 @@
               <th class="px-5 py-3 text-left">Department</th>
               <th class="px-5 py-3 text-left">Courses</th>
               <th class="px-5 py-3 text-left">Progress</th>
-              <th class="px-5 py-3 text-left">Status</th>
-            </tr>
+              <th class="px-5 py-3 text-left">Status</th>              <th class="px-5 py-3 text-left">Action</th>            </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
             @forelse($students as $idx => $student)
@@ -264,6 +263,9 @@
                     </span>
                   @endif
                 </td>
+                <td class="px-5 py-3.5">
+                    <a href="{{ route('department.reports.student', ['student' => $student->id]) }}" class="text-xs font-bold text-blue-600 hover:underline">View</a>
+                </td>
               </tr>
             @empty
               <tr>
@@ -309,6 +311,7 @@
               <th class="px-5 py-3 text-left">Completed</th>
               <th class="px-5 py-3 text-left">Completion Rate</th>
               <th class="px-5 py-3 text-left">Avg Progress</th>
+              <th class="px-5 py-3 text-left">Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -352,6 +355,9 @@
                     </div>
                     <span class="text-xs font-bold text-gray-600">{{ $rate }}%</span>
                   </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <a href="{{ route('department.reports.course.marks', ['course' => $row->course_id ?? 0]) }}" class="text-xs font-bold text-blue-600 hover:underline">View</a>
                 </td>
                 <td class="px-5 py-3.5">
                   <div class="flex items-center gap-2">

@@ -302,6 +302,7 @@ class CSEDashboardController extends Controller
                     })->count();
 
                     return (object) [
+                        'course_id' => $first?->course?->id ?? null,
                         'title' => $first?->course?->title ?? 'Course',
                         'enrolled' => $group->count(),
                         'completed' => $completed,
@@ -350,5 +351,46 @@ class CSEDashboardController extends Controller
             'inProgressEnrollments',
             'courseProgressRows'
         ));
+    }
+
+    public function studentReport(Students $student)
+    {
+        $admin = Auth::guard('web')->user();
+        $departmentId = $admin?->department_id;
+
+        abort_if(!$departmentId || $student->department_id !== $departmentId, 403);
+
+        $department = Departments::find($departmentId);
+
+        $student->load(['diagnosticAttempts' => function ($q) {
+            $q->latest('completed_at');
+        }, 'assessments.module']);
+
+        $moduleTests = $student->assessments
+            ->where('assessment_type', 'test')
+            ->whereNotNull('module_id');
+
+        $latestDiagnostic = $student->diagnosticAttempts->sortByDesc('completed_at')->first();
+
+        return view('admin.student-report', compact('department', 'student', 'moduleTests', 'latestDiagnostic'));
+    }
+
+    public function courseModuleMarks($courseId)
+    {
+        $admin = Auth::guard('web')->user();
+        $departmentId = $admin?->department_id;
+
+        $department = $departmentId ? Departments::find($departmentId) : null;
+        $course = Course::with('modules')->findOrFail($courseId);
+
+        abort_if(!$departmentId || $course->department_id !== $departmentId, 403);
+
+        $moduleAssessments = Assessments::query()
+            ->where('assessment_type', 'test')
+            ->whereIn('module_id', $course->modules->pluck('id'))
+            ->with(['student', 'module'])
+            ->get();
+
+        return view('admin.course-module-marks', compact('department', 'course', 'moduleAssessments'));
     }
 }
