@@ -9,6 +9,7 @@ class Question extends Model
     protected $fillable = [
         'department_id',
         'course_id',
+        'module_id',
         'topic',
         'difficulty_level',
         'question_text',
@@ -32,9 +33,13 @@ class Question extends Model
         return $this->belongsTo(Course::class, 'course_id');
     }
 
+    public function module()
+    {
+        return $this->belongsTo(Modules::class, 'module_id');
+    }
+
     public function attemptAnswers()
     {
         return $this->hasMany(AssessmentAttemptAnswer::class, 'question_id');
     }
 }
-

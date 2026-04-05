@@ -134,5 +134,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(DepartmentDiagnosticQuestionSeeder::class);
+        $this->call(ModuleQuestionSeeder::class);
     }
 }

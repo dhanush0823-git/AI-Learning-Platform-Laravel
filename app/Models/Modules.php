@@ -24,4 +24,9 @@ class Modules extends Model
     {
         return $this->hasMany(Lessons::class, 'module_id')->orderBy('lesson_number');
     }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class, 'module_id');
+    }
 }

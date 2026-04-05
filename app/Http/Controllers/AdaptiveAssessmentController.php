@@ -66,6 +66,17 @@ class AdaptiveAssessmentController extends Controller
             return redirect()->back()->with('error', 'You must complete all lessons in this module before taking the module test.');
         }
 
+        $moduleQuestionCount = Question::query()
+            ->where('department_id', $student->department_id)
+            ->where('course_id', $course->id)
+            ->where('module_id', $module->id)
+            ->where('is_active', true)
+            ->count();
+
+        if ($moduleQuestionCount === 0) {
+            return redirect()->back()->with('error', 'No module test questions have been added for this module yet.');
+        }
+
         $assessment = Assessments::firstOrCreate(
             [
                 'student_id' => $student->id,
@@ -76,7 +87,7 @@ class AdaptiveAssessmentController extends Controller
             [
                 'department_id' => $student->department_id,
                 'score' => 0,
-                'total_questions' => 10,
+                'total_questions' => min(10, $moduleQuestionCount),
                 'time_taken' => 0,
                 'started_at' => now(),
                 'answers' => [
@@ -125,6 +136,12 @@ class AdaptiveAssessmentController extends Controller
             ->whereNotIn('id', $askedQuestionIds);
 
         $courseId = $assessment->answers['course_id'] ?? null;
+        $moduleId = $assessment->answers['module_id'] ?? $assessment->module_id;
+
+        if ($moduleId) {
+            $query->where('module_id', $moduleId);
+        }
+
         if ($courseId) {
             $query->where(function ($q) use ($courseId) {
                 $q->whereNull('course_id')->orWhere('course_id', $courseId);
@@ -134,13 +151,22 @@ class AdaptiveAssessmentController extends Controller
         $question = $query->inRandomOrder()->first();
 
         if (!$question) {
-            // Fallback: pick any unanswered question for this department.
-            $question = Question::query()
+            $fallbackQuery = Question::query()
                 ->where('department_id', $assessment->department_id)
                 ->where('is_active', true)
-                ->whereNotIn('id', $askedQuestionIds)
-                ->inRandomOrder()
-                ->first();
+                ->whereNotIn('id', $askedQuestionIds);
+
+            if ($moduleId) {
+                $fallbackQuery->where('module_id', $moduleId);
+            }
+
+            if ($courseId) {
+                $fallbackQuery->where(function ($q) use ($courseId) {
+                    $q->whereNull('course_id')->orWhere('course_id', $courseId);
+                });
+            }
+
+            $question = $fallbackQuery->inRandomOrder()->first();
         }
 
         if (!$question) {
@@ -182,6 +208,11 @@ class AdaptiveAssessmentController extends Controller
             ->where('id', $validated['question_id'])
             ->where('department_id', $assessment->department_id)
             ->firstOrFail();
+
+        $moduleId = $assessment->answers['module_id'] ?? $assessment->module_id;
+        if ($moduleId && (int) $question->module_id !== (int) $moduleId) {
+            abort(404);
+        }
 
         $alreadyAnswered = AssessmentAttemptAnswer::query()
             ->where('assessment_id', $assessment->id)
@@ -317,4 +348,3 @@ class AdaptiveAssessmentController extends Controller
         $profile->save();
     }
 }
-
