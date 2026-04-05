@@ -302,6 +302,15 @@
     @stack('styles')
 </head>
 <body>
+  @php
+    $studentUser = auth('student')->user();
+    $adminUser = auth('web')->user();
+    $currentUser = $studentUser ?? $adminUser;
+    $isStudentAuthenticated = ! is_null($studentUser);
+    $isAdminAuthenticated = ! is_null($adminUser);
+    $isAuthenticated = $isStudentAuthenticated || $isAdminAuthenticated;
+    $dashboardRoute = $isAdminAuthenticated ? route('department.dashboard') : route('dashboard');
+  @endphp
 
   {{-- ══ NAVBAR ══════════════════════════════════════ --}}
   <nav class="navbar" id="navbar">
@@ -321,25 +330,25 @@
         <a href="{{ route('home') }}"        class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"><span class="nav-icon">🏠</span>Home</a>
         <a href="{{ route('courses') }}"     class="nav-link {{ request()->routeIs('courses*') ? 'active' : '' }}"><span class="nav-icon">📚</span>Courses</a>
         <a href="{{ route('learn') }}"       class="nav-link {{ request()->routeIs('learn*') ? 'active' : '' }}"><span class="nav-icon">🎯</span>Learning Path</a>
-        @auth('student')
+        @if($isStudentAuthenticated)
         <a href="{{ route('diagnostic.test') }}" class="nav-link {{ request()->routeIs('diagnostic.*') ? 'active' : '' }}"><span class="nav-badge badge-dt">DT</span>Diagnostic</a>
         <a href="{{ route('chat.index') }}"  class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}"><span class="nav-badge badge-ai">AI</span>AI Chat</a>
-        @endauth
+        @endif
         <a href="{{ route('assessments') }}" class="nav-link {{ request()->routeIs('assessments*') ? 'active' : '' }}"><span class="nav-icon">📝</span>Assessments</a>
-        <a href="{{ route('dashboard') }}"   class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><span class="nav-icon">📊</span>Dashboard</a>
+        <a href="{{ $dashboardRoute }}"   class="nav-link {{ request()->routeIs('dashboard') || request()->routeIs('department.dashboard') ? 'active' : '' }}"><span class="nav-icon">📊</span>Dashboard</a>
       </div>
 
       {{-- Right --}}
       <div class="nav-right">
-        @auth('student')
+        @if($isAuthenticated)
           <div class="user-pill">
             <div class="avatar">
-              {{ strtoupper(substr(auth('student')->user()->name, 0, 1)) }}
+              {{ strtoupper(substr($currentUser->name ?? 'U', 0, 1)) }}
               <div class="avatar-dot"></div>
             </div>
             <div style="display:flex;flex-direction:column;">
-              <span class="uname">{{ auth('student')->user()->name }}</span>
-              <span class="urole">Learner</span>
+              <span class="uname">{{ $currentUser->name }}</span>
+              <span class="urole">{{ $isAdminAuthenticated ? 'Department Admin' : 'Learner' }}</span>
             </div>
             <form method="POST" action="{{ route('logout') }}" style="display:inline;margin:0;">
               @csrf
@@ -349,7 +358,7 @@
         @else
           <a href="{{ route('login') }}"    class="btn-login">🔑 Log In</a>
           <a href="{{ route('register') }}" class="btn-signup">✨ Sign Up</a>
-        @endauth
+        @endif
         <button class="hamburger" id="hamburger" onclick="toggleMobile()" aria-label="Menu">
           <svg id="ham-icon" width="17" height="17" fill="none" stroke="#555" stroke-width="2.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
@@ -364,18 +373,18 @@
         <a href="{{ route('home') }}"        class="mob-link {{ request()->routeIs('home') ? 'active' : '' }}">🏠 Home</a>
         <a href="{{ route('courses') }}"     class="mob-link {{ request()->routeIs('courses*') ? 'active' : '' }}">📚 Courses</a>
         <a href="{{ route('learn') }}"       class="mob-link {{ request()->routeIs('learn*') ? 'active' : '' }}">🎯 Learning Path</a>
-        @auth('student')
+        @if($isStudentAuthenticated)
         <a href="{{ route('diagnostic.test') }}" class="mob-link {{ request()->routeIs('diagnostic.*') ? 'active' : '' }}">🧪 Diagnostic Test</a>
         <a href="{{ route('chat.index') }}"  class="mob-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">🤖 AI Chat</a>
-        @endauth
+        @endif
         <a href="{{ route('assessments') }}" class="mob-link {{ request()->routeIs('assessments*') ? 'active' : '' }}">📝 Assessments</a>
-        <a href="{{ route('dashboard') }}"   class="mob-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">📊 Dashboard</a>
-        @guest('student')
+        <a href="{{ $dashboardRoute }}"   class="mob-link {{ request()->routeIs('dashboard') || request()->routeIs('department.dashboard') ? 'active' : '' }}">📊 Dashboard</a>
+        @unless($isAuthenticated)
         <div class="mob-auth">
           <a href="{{ route('login') }}"    style="color:#4285F4;border:1.5px solid #c7d8fd;">🔑 Log In</a>
           <a href="{{ route('register') }}" style="color:#fff;background:linear-gradient(135deg,#4285F4,#34A853);">✨ Sign Up</a>
         </div>
-        @endguest
+        @endunless
       </div>
     </div>
   </nav>
@@ -456,4 +465,6 @@
   @stack('scripts')
 </body>
 </html>
+
+
 

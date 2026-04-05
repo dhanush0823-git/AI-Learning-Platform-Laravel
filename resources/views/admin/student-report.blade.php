@@ -152,7 +152,7 @@
                                 <th class="px-6 py-4 text-left">Score</th>
                                 <th class="px-6 py-4 text-left">Percentage</th>
                                 <th class="px-6 py-4 text-left">Status</th>
-                                <th class="px-6 py-4 text-left">Action</th>
+                                <!-- <th class="px-6 py-4 text-left">Action</th> -->
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -199,7 +199,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <!-- <td class="px-6 py-4">
                                         <a
                                             href="{{ route('assessments.adaptive.result', $test) }}"
                                             class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700"
@@ -209,7 +209,7 @@
                                             </svg>
                                             View
                                         </a>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>

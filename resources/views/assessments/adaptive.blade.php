@@ -240,6 +240,12 @@ const totalQ     = {{ (int) $assessment->total_questions }};
 let questionStartAt = Date.now();
 let overallSec = {{ (int) $assessment->time_taken }};
 let answeredCount = 0;
+const submitBtnDefault = `
+  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+  </svg>
+  Submit Answer
+`;
 
 /* ── Timer ── */
 const timerEl = document.getElementById('timerVal');
@@ -310,7 +316,9 @@ function renderQuestion(question, answered) {
   }
 
   document.getElementById('actionHint').textContent = 'Select an option to continue';
-  document.getElementById('submitBtn').disabled = false;
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = submitBtnDefault;
 }
 
 /* ── Load next question ── */
@@ -337,7 +345,11 @@ document.getElementById('answerForm').addEventListener('submit', async (e) => {
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, Accept: 'application/json' },
     body: JSON.stringify({ question_id: document.getElementById('question_id').value, selected_option: sel.value, time_spent_seconds: spent })
   });
-  if (!res.ok) { btn.disabled = false; btn.textContent = 'Submit Answer'; return; }
+  if (!res.ok) {
+    btn.disabled = false;
+    btn.innerHTML = submitBtnDefault;
+    return;
+  }
 
   const data = await res.json();
   document.getElementById('diffVal').textContent = data.current_difficulty;
