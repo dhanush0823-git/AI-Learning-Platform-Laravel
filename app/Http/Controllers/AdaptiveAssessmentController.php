@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\AssessmentAttemptAnswer;
 use App\Models\Assessments;
+use App\Models\Course;
+use App\Models\LessonProgress;
+use App\Models\Modules;
 use App\Models\Question;
 use App\Models\StudentSkillProfile;
 use Illuminate\Http\Request;
@@ -44,10 +47,57 @@ class AdaptiveAssessmentController extends Controller
         return redirect()->route('assessments.adaptive.take', $assessment);
     }
 
+    public function startModule($courseId, $moduleId)
+    {
+        $student = Auth::guard('student')->user();
+
+        $course = Course::with('modules.lessons')->findOrFail($courseId);
+        $module = Modules::where('id', $moduleId)->where('course_id', $course->id)->firstOrFail();
+
+        // Module completion check
+        $lessonIds = $module->lessons->pluck('id');
+        $completedLessons = LessonProgress::query()
+            ->where('student_id', $student->id)
+            ->whereIn('lesson_id', $lessonIds)
+            ->where('status', 'completed')
+            ->count();
+
+        if ($lessonIds->count() === 0 || $completedLessons < $lessonIds->count()) {
+            return redirect()->back()->with('error', 'You must complete all lessons in this module before taking the module test.');
+        }
+
+        $assessment = Assessments::firstOrCreate(
+            [
+                'student_id' => $student->id,
+                'module_id' => $module->id,
+                'assessment_type' => 'test',
+                'is_adaptive' => false,
+            ],
+            [
+                'department_id' => $student->department_id,
+                'score' => 0,
+                'total_questions' => 10,
+                'time_taken' => 0,
+                'started_at' => now(),
+                'answers' => [
+                    'course_id' => $course->id,
+                    'module_id' => $module->id,
+                    'responses_count' => 0,
+                ],
+            ]
+        );
+
+        if ($assessment->completed_at) {
+            return redirect()->route('assessments.adaptive.result', $assessment);
+        }
+
+        return redirect()->route('assessments.adaptive.take', $assessment);
+    }
+
     public function take(Assessments $assessment)
     {
         $student = Auth::guard('student')->user();
-        abort_unless($assessment->student_id === $student->id && $assessment->is_adaptive, 403);
+        abort_unless($assessment->student_id === $student->id && ($assessment->is_adaptive || $assessment->assessment_type === 'test'), 403);
 
         return view('assessments.adaptive', compact('assessment'));
     }
@@ -55,7 +105,7 @@ class AdaptiveAssessmentController extends Controller
     public function nextQuestion(Assessments $assessment)
     {
         $student = Auth::guard('student')->user();
-        abort_unless($assessment->student_id === $student->id && $assessment->is_adaptive, 403);
+        abort_unless($assessment->student_id === $student->id && ($assessment->is_adaptive || $assessment->assessment_type === 'test'), 403);
 
         if ($assessment->completed_at) {
             return response()->json(['done' => true]);
@@ -116,7 +166,7 @@ class AdaptiveAssessmentController extends Controller
     public function submitAnswer(Request $request, Assessments $assessment)
     {
         $student = Auth::guard('student')->user();
-        abort_unless($assessment->student_id === $student->id && $assessment->is_adaptive, 403);
+        abort_unless($assessment->student_id === $student->id && ($assessment->is_adaptive || $assessment->assessment_type === 'test'), 403);
 
         if ($assessment->completed_at) {
             return response()->json(['message' => 'Assessment already completed.'], 422);
@@ -192,7 +242,7 @@ class AdaptiveAssessmentController extends Controller
     public function finish(Assessments $assessment)
     {
         $student = Auth::guard('student')->user();
-        abort_unless($assessment->student_id === $student->id && $assessment->is_adaptive, 403);
+        abort_unless($assessment->student_id === $student->id && ($assessment->is_adaptive || $assessment->assessment_type === 'test'), 403);
 
         if (!$assessment->completed_at) {
             $this->completeAssessment($assessment);
@@ -207,7 +257,7 @@ class AdaptiveAssessmentController extends Controller
     public function result(Assessments $assessment)
     {
         $student = Auth::guard('student')->user();
-        abort_unless($assessment->student_id === $student->id && $assessment->is_adaptive, 403);
+        abort_unless($assessment->student_id === $student->id && ($assessment->is_adaptive || $assessment->assessment_type === 'test'), 403);
 
         $answered = $assessment->attemptAnswers()->count();
         $percentage = $answered > 0 ? round(((float) $assessment->score / $answered) * 100, 2) : 0;

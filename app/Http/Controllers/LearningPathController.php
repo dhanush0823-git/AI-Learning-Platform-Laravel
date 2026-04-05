@@ -78,6 +78,11 @@ class LearningPathController extends Controller
         $lessonProgress->save();
 
         $moduleLessons = $module->lessons->sortBy('lesson_number')->values();
+        $lessonStatuses = LessonProgress::query()
+            ->where('student_id', $student->id)
+            ->whereIn('lesson_id', $moduleLessons->pluck('id'))
+            ->get()
+            ->keyBy('lesson_id');
         $nextLesson = $this->findNextLesson($course, $module, $lesson);
 
         return view('learn.lesson', compact(
@@ -86,6 +91,7 @@ class LearningPathController extends Controller
             'module',
             'lesson',
             'moduleLessons',
+            'lessonStatuses',
             'nextLesson',
             'lessonProgress'
         ));
@@ -148,6 +154,23 @@ class LearningPathController extends Controller
         $progress->save();
 
         $this->updateCourseProgress($student->id, $course->id);
+
+        // If the module is completed, direct the student to the module test.
+        $moduleLessonIds = $module->lessons->pluck('id');
+        $completedModuleLessons = LessonProgress::query()
+            ->where('student_id', $student->id)
+            ->whereIn('lesson_id', $moduleLessonIds)
+            ->where('status', 'completed')
+            ->count();
+
+        $moduleIsCompleted = $moduleLessonIds->count() > 0 && $completedModuleLessons >= $moduleLessonIds->count();
+
+        if ($moduleIsCompleted) {
+            return redirect()->route('assessments.module.start', [
+                'courseId' => $course->id,
+                'moduleId' => $module->id,
+            ])->with('status', 'Module completed! Please take the module test.');
+        }
 
         $nextLesson = $this->findNextLesson($course, $module, $lesson);
 
