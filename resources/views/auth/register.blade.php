@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - AI Learning Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -15,10 +15,64 @@
       box-shadow: 0 0 0 3px rgba(66,133,244,0.12);
       outline: none;
     }
-    .select-focus:focus {
+    /* ── Department Select ── */
+    select.custom-select {
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: #f9fafb;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%234285F4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      border: 1.5px solid #e8e9eb;
+      border-radius: 14px;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-family: inherit;
+      font-weight: 500;
+      padding: 11px 44px 11px 16px;
+      width: 100%;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    select.custom-select:hover {
+      border-color: #bfdbfe;
+      background-color: #fff;
+    }
+    select.custom-select:focus {
       border-color: #4285F4;
       box-shadow: 0 0 0 3px rgba(66,133,244,0.12);
+      background-color: #fff;
       outline: none;
+    }
+    select.custom-select option {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      padding: 10px 14px;
+      background: #fff;
+    }
+    select.custom-select option:disabled {
+      color: #aaa;
+    }
+    /* Wrapper glow on focus-within */
+    .dept-select-wrap {
+      position: relative;
+      border-radius: 14px;
+    }
+    .dept-select-wrap::before {
+      content: '🏛️';
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      pointer-events: none;
+      z-index: 1;
+      line-height: 1;
+    }
+    .dept-select-wrap select.custom-select {
+      padding-left: 42px;
     }
     .btn-gradient {
       background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
@@ -49,20 +103,7 @@
     .fade-up-5 { animation: fadeUp 0.5s ease 0.25s both; }
     .fade-up-6 { animation: fadeUp 0.5s ease 0.30s both; }
     .fade-up-7 { animation: fadeUp 0.5s ease 0.35s both; }
-
-    /* Password strength bar */
     .strength-bar { height: 4px; border-radius: 999px; transition: width 0.4s ease, background 0.4s ease; }
-
-    /* Custom select arrow */
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234285F4'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    /* Step indicator active */
     .step-active { background: linear-gradient(135deg,#4285F4,#34A853); color: white; }
     .step-done   { background: #34A853; color: white; }
     .step-idle   { background: #f1f5f9; color: #94a3b8; }
@@ -70,14 +111,12 @@
 </head>
 <body class="gradient-bg min-h-screen">
 
-  <!-- Background decorations -->
   <div class="fixed inset-0 dot-pattern opacity-40 pointer-events-none"></div>
   <div class="fixed top-0 left-0 w-96 h-96 rounded-full opacity-10 pointer-events-none"
        style="background:radial-gradient(circle,#34A853,transparent);transform:translate(-30%,-30%)"></div>
   <div class="fixed bottom-0 right-0 w-80 h-80 rounded-full opacity-10 pointer-events-none"
        style="background:radial-gradient(circle,#4285F4,transparent);transform:translate(30%,30%)"></div>
 
-  <!-- Top Nav -->
   <nav class="relative z-10 px-6 py-4">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2.5">
@@ -91,18 +130,15 @@
     </div>
   </nav>
 
-  <!-- Main -->
   <div class="relative z-10 flex min-h-[calc(100vh-72px)]">
 
     <!-- Left Panel -->
     <div class="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 py-12">
       <div class="max-w-md">
-
         <div class="inline-flex items-center gap-2 bg-green-50 border border-green-100 rounded-full px-3 py-1.5 mb-8 fade-up">
           <span class="w-2 h-2 rounded-full bg-green-500"></span>
           <span class="text-xs font-bold tracking-widest text-green-600 uppercase">Join 1,000+ Engineers</span>
         </div>
-
         <h1 class="text-4xl font-extrabold text-gray-900 mb-5 fade-up-1" style="line-height:1.15">
           Start Your<br/>
           <span style="background:linear-gradient(135deg,#4285F4,#34A853);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
@@ -112,8 +148,6 @@
         <p class="text-gray-500 text-base leading-relaxed mb-10 fade-up-2">
           Create your free account and get instant access to department-specific courses, AI-powered learning paths, and progress tracking.
         </p>
-
-        <!-- Steps preview -->
         <div class="space-y-4 mb-10 fade-up-3">
           <div class="flex items-start gap-4">
             <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 step-active">1</div>
@@ -126,8 +160,8 @@
           <div class="flex items-start gap-4">
             <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 step-idle">2</div>
             <div class="pt-0.5">
-              <p class="text-sm font-semibold text-gray-800 leading-none">Pick your level</p>
-              <p class="text-xs text-gray-400 mt-1">Choose your skill level and batch</p>
+              <p class="text-sm font-semibold text-gray-800 leading-none">Take diagnostic test</p>
+              <p class="text-xs text-gray-400 mt-1">Your level is set automatically</p>
             </div>
           </div>
           <div class="w-px h-4 bg-gray-200 ml-4"></div>
@@ -139,8 +173,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Stat cards -->
         <div class="flex gap-4 fade-up-4">
           <div class="bg-white border border-gray-200 rounded-2xl px-4 py-4 card-shadow float-anim flex-1 text-center">
             <div class="text-xl font-extrabold text-blue-600">Free</div>
@@ -155,26 +187,21 @@
             <div class="text-xs text-gray-400 font-medium mt-0.5">Powered</div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- Right Panel: Form -->
+    <!-- Right Panel -->
     <div class="w-full lg:w-1/2 flex items-center justify-center px-6 py-10">
       <div class="w-full max-w-md">
-
         <div class="bg-white rounded-3xl p-8 card-shadow border border-gray-100 fade-up">
 
-          <!-- Top accent -->
           <div class="h-1 rounded-full mb-7 btn-gradient"></div>
 
-          <!-- Header -->
           <div class="mb-6">
             <h2 class="text-2xl font-extrabold text-gray-900 leading-tight">Create your account ✨</h2>
             <p class="text-sm text-gray-400 mt-1.5">Join as a student and start learning for free</p>
           </div>
 
-          <!-- Error block (Laravel) -->
           @if ($errors->any())
             <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-5">
               <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">Please fix the following:</p>
@@ -185,12 +212,12 @@
               </ul>
             </div>
           @endif
+
           <div id="errorBlock" class="hidden bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-5">
             <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">Please fix the following:</p>
             <ul id="errorList" class="list-disc list-inside space-y-0.5 text-xs text-red-600"></ul>
           </div>
 
-          <!-- Form -->
           <form id="registerForm" action="{{ route('register') }}" method="POST" class="space-y-4" novalidate>
             @csrf
 
@@ -198,7 +225,7 @@
             <div class="fade-up-1">
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Full Name</label>
               <div class="relative">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
                 <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Arjun Sharma"
@@ -211,7 +238,7 @@
             <div class="fade-up-2">
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Email Address</label>
               <div class="relative">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="you@college.edu"
@@ -220,34 +247,34 @@
               </div>
             </div>
 
-            <!-- Department -->
-            <div class="grid grid-cols-1 gap-3 fade-up-3">
-              <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Department</label>
-                <div class="relative">
-                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                  </svg>
-                  <select name="department_id" id="department_id"
-                    class="select-focus w-full pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 bg-gray-50 cursor-pointer transition-all"
-                    required>
-                    <option value="">Select dept</option>
-                    @foreach ($departments as $department)
-                      <option value="{{ $department->id }}" @selected(old('department_id') == $department->id)>
-                        {{ $department->code }}
-                      </option>
-                    @endforeach
-	                  </select>
-                    <p class="text-[11px] text-gray-400 mt-1">Learning level is assigned after diagnostic test.</p>
-	                </div>
-	              </div>
+            <!-- ── Department ── -->
+            <div class="fade-up-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Department</label>
+              <div class="dept-select-wrap">
+                <select name="department_id" id="department_id"
+                  class="custom-select"
+                  required>
+                  <option value="" disabled selected>Select your department</option>
+                  @foreach ($departments as $department)
+                    <option value="{{ $department->id }}" @selected(old('department_id') == $department->id)>
+                      {{ $department->code }} — {{ $department->name }}
+                    </option>
+                  @endforeach
+                </select>
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+                <svg class="w-3 h-3 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                Learning level is assigned automatically after your diagnostic test.
+              </p>
             </div>
 
-            <!-- Batch -->
+            <!-- Batch Year -->
             <div class="fade-up-4">
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Batch Year</label>
               <div class="relative">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
                 <input type="text" name="batch" id="batch" value="{{ old('batch') }}" placeholder="e.g. 2026"
@@ -261,7 +288,7 @@
             <div class="fade-up-5">
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Password</label>
               <div class="relative">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
                 <input id="password" type="password" name="password" placeholder="Min. 8 characters"
@@ -275,7 +302,6 @@
                   </svg>
                 </button>
               </div>
-              <!-- Strength indicator -->
               <div class="mt-2 flex gap-1">
                 <div class="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden"><div id="bar1" class="strength-bar w-0"></div></div>
                 <div class="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden"><div id="bar2" class="strength-bar w-0"></div></div>
@@ -289,7 +315,7 @@
             <div class="fade-up-6">
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Confirm Password</label>
               <div class="relative">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                 </svg>
                 <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Re-enter password"
@@ -302,7 +328,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                   </svg>
                 </button>
-                <span id="matchIcon" class="absolute right-10 top-1/2 -translate-y-1/2 text-sm hidden"></span>
               </div>
               <p id="matchLabel" class="text-xs mt-1 hidden"></p>
             </div>
@@ -327,7 +352,6 @@
 
           </form>
 
-          <!-- Footer -->
           <p class="text-center text-sm text-gray-400 mt-5">
             Already have an account?
             <a href="/login" class="font-semibold text-blue-500 hover:text-blue-700 transition-colors ml-1">Sign in</a>
@@ -356,89 +380,77 @@
   </div>
 
   <script>
-    // ── Toggle password visibility ──────────────────────
     function togglePwd(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon  = document.getElementById(iconId);
-      const isHidden = input.type === 'password';
-      input.type = isHidden ? 'text' : 'password';
+      const isHidden = input.type === "password";
+      input.type = isHidden ? "text" : "password";
       icon.innerHTML = isHidden
         ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`
         : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
     }
 
-    // ── Password strength ───────────────────────────────
     function checkStrength(val) {
       let score = 0;
-      if (val.length >= 8)              score++;
-      if (/[A-Z]/.test(val))            score++;
-      if (/[0-9]/.test(val))            score++;
-      if (/[^A-Za-z0-9]/.test(val))     score++;
-
-      const colors = ['', '#ef4444','#f59e0b','#3b82f6','#22c55e'];
-      const labels = ['', 'Weak','Fair','Good','Strong'];
-      const labelColors = ['','text-red-500','text-amber-500','text-blue-500','text-green-500'];
-
+      if (val.length >= 8)           score++;
+      if (/[A-Z]/.test(val))         score++;
+      if (/[0-9]/.test(val))         score++;
+      if (/[^A-Za-z0-9]/.test(val))  score++;
+      const colors = ["","#ef4444","#f59e0b","#3b82f6","#22c55e"];
+      const labels = ["","Weak","Fair","Good","Strong"];
+      const lblCls = ["","text-red-500","text-amber-500","text-blue-500","text-green-500"];
       for (let i = 1; i <= 4; i++) {
-        const bar = document.getElementById('bar' + i);
-        bar.style.width = i <= score ? '100%' : '0%';
-        bar.style.background = i <= score ? colors[score] : '';
+        const b = document.getElementById("bar"+i);
+        b.style.width = i <= score ? "100%" : "0%";
+        b.style.background = i <= score ? colors[score] : "";
       }
-
-      const lbl = document.getElementById('strengthLabel');
-      lbl.textContent = val.length ? labels[score] : '';
-      lbl.className = 'text-xs mt-1 ' + (val.length ? labelColors[score] : 'text-gray-400');
+      const lbl = document.getElementById("strengthLabel");
+      lbl.textContent = val.length ? labels[score] : "";
+      lbl.className = "text-xs mt-1 " + (val.length ? lblCls[score] : "text-gray-400");
     }
 
-    // ── Password match ──────────────────────────────────
     function checkMatch() {
-      const pwd   = document.getElementById('password').value;
-      const conf  = document.getElementById('password_confirmation').value;
-      const lbl   = document.getElementById('matchLabel');
-      const icon  = document.getElementById('matchIcon');
-      const input = document.getElementById('password_confirmation');
-
-      if (!conf) { lbl.classList.add('hidden'); icon.classList.add('hidden'); return; }
-
+      const pwd  = document.getElementById("password").value;
+      const conf = document.getElementById("password_confirmation").value;
+      const lbl  = document.getElementById("matchLabel");
+      const inp  = document.getElementById("password_confirmation");
+      if (!conf) { lbl.classList.add("hidden"); return; }
       if (pwd === conf) {
-        lbl.textContent = 'Passwords match ✓';
-        lbl.className = 'text-xs mt-1 text-green-500';
-        lbl.classList.remove('hidden');
-        input.style.borderColor = '#22c55e';
+        lbl.textContent = "Passwords match ✓";
+        lbl.className = "text-xs mt-1 text-green-500";
+        lbl.classList.remove("hidden");
+        inp.style.borderColor = "#22c55e";
       } else {
-        lbl.textContent = 'Passwords do not match';
-        lbl.className = 'text-xs mt-1 text-red-500';
-        lbl.classList.remove('hidden');
-        input.style.borderColor = '#ef4444';
+        lbl.textContent = "Passwords do not match";
+        lbl.className = "text-xs mt-1 text-red-500";
+        lbl.classList.remove("hidden");
+        inp.style.borderColor = "#ef4444";
       }
     }
 
-    // ── Client-side validation ──────────────────────────
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
+    document.getElementById("registerForm").addEventListener("submit", function(e) {
       const errors = [];
-      const name   = document.getElementById('name').value.trim();
-      const email  = document.getElementById('email').value.trim();
-      const dept   = document.getElementById('department_id').value;
-      const batch  = document.getElementById('batch').value.trim();
-      const pwd    = document.getElementById('password').value;
-      const conf   = document.getElementById('password_confirmation').value;
-      const terms  = document.getElementById('terms').checked;
-
-      if (!name)                                   errors.push('Full name is required.');
-      if (!email || !/\S+@\S+\.\S+/.test(email)) errors.push('A valid email address is required.');
-      if (!dept)                                   errors.push('Please select your department.');
-      if (!batch || !/^\d{4}$/.test(batch))        errors.push('Enter a valid 4-digit batch year.');
-      if (pwd.length < 8)                          errors.push('Password must be at least 8 characters.');
-      if (pwd !== conf)                            errors.push('Passwords do not match.');
-      if (!terms)                                  errors.push('You must agree to the Terms of Service.');
-
+      const name  = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const dept  = document.getElementById("department_id").value;
+      const batch = document.getElementById("batch").value.trim();
+      const pwd   = document.getElementById("password").value;
+      const conf  = document.getElementById("password_confirmation").value;
+      const terms = document.getElementById("terms").checked;
+      if (!name)                                  errors.push("Full name is required.");
+      if (!email || !/\S+@\S+\.\S+/.test(email)) errors.push("A valid email address is required.");
+      if (!dept)                                  errors.push("Please select your department.");
+      if (!batch || !/^\d{4}$/.test(batch))       errors.push("Enter a valid 4-digit batch year.");
+      if (pwd.length < 8)                         errors.push("Password must be at least 8 characters.");
+      if (pwd !== conf)                           errors.push("Passwords do not match.");
+      if (!terms)                                 errors.push("You must agree to the Terms of Service.");
       if (errors.length) {
         e.preventDefault();
-        const block = document.getElementById('errorBlock');
-        const list  = document.getElementById('errorList');
-        list.innerHTML = errors.map(err => `<li>${err}</li>`).join('');
-        block.classList.remove('hidden');
-        block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const block = document.getElementById("errorBlock");
+        const list  = document.getElementById("errorList");
+        list.innerHTML = errors.map(err => `<li>${err}</li>`).join("");
+        block.classList.remove("hidden");
+        block.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     });
   </script>
