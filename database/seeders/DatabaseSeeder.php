@@ -5,13 +5,15 @@ use Illuminate\Database\Seeder;
 use App\Models\Departments;
 use App\Models\Course;
 use App\Models\Modules;
-use App\Models\Lessons;
 use App\Models\Students;
 use App\Models\User;
+use Database\Seeders\Concerns\SeedsRichCourseContent;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
+    use SeedsRichCourseContent;
+
     public function run()
     {
         User::updateOrCreate(
@@ -33,7 +35,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($departments as $dept) {
-            Departments::create($dept);
+            Departments::updateOrCreate(
+                ['code' => $dept['code']],
+                $dept
+            );
         }
 
         // Create Courses for each department
@@ -85,56 +90,68 @@ class DatabaseSeeder extends Seeder
 
         foreach ($courses as $courseData) {
             $department = Departments::where('code', $courseData['department_code'])->first();
-            $course = Course::create([
-                'title' => $courseData['title'],
-                'description' => $courseData['description'],
-                'department_id' => $department->id,
-                'difficulty' => $courseData['difficulty'],
-                'icon' => $courseData['icon'] ?? null,
-                'duration' => $courseData['duration'] ?? null,
-                'youtube_link' => $courseData['youtube_link'] ?? null,
-                'total_modules' => 5
-            ]);
+            $course = Course::updateOrCreate(
+                ['title' => $courseData['title'], 'department_id' => $department->id],
+                [
+                    'description' => $courseData['description'],
+                    'difficulty' => $courseData['difficulty'],
+                    'icon' => $courseData['icon'] ?? null,
+                    'duration' => $courseData['duration'] ?? null,
+                    'youtube_link' => $this->resolveCourseYoutubeLink(
+                        $courseData['title'],
+                        $courseData['youtube_link'] ?? null
+                    ),
+                    'total_modules' => 5,
+                ]
+            );
+
+            $modules = $this->buildModuleBlueprints($course->title, $course->description);
 
             // Create 5 modules for each course
             for ($i = 1; $i <= 5; $i++) {
-                $module = Modules::create([
-                    'course_id' => $course->id,
-                    'module_number' => $i,
-                    'title' => "Module {$i}: " . $course->title . " Part {$i}",
-                    'description' => "Detailed content for module {$i}",
-                    'duration' => 120
-                ]);
+                $moduleData = $modules[$i];
+                $module = Modules::updateOrCreate(
+                    ['course_id' => $course->id, 'module_number' => $i],
+                    [
+                        'title' => $moduleData['title'],
+                        'description' => $moduleData['description'],
+                        'duration' => 120,
+                    ]
+                );
 
-                // Create 8 lessons for each module
-                for ($j = 1; $j <= 8; $j++) {
-                    Lessons::create([
-                        'module_id' => $module->id,
-                        'lesson_number' => $j,
-                        'title' => "Lesson {$j}: Topic {$j}",
-                        'content' => "This is the detailed content for lesson {$j}.",
-                        'duration' => 15,
-                        'lesson_type' => $j % 2 == 0 ? 'video' : 'reading',
-                        'video_url' => $j % 2 == 0 ? 'https://www.youtube.com/watch?v=sample' : null
-                    ]);
-                }
+                $this->syncModuleLessons(
+                    $module,
+                    $course->title,
+                    $moduleData['title'],
+                    $moduleData['description'],
+                    $moduleData['topics'],
+                    $moduleData['lessons'],
+                    14
+                );
             }
         }
 
         // Create a sample student
-        Students::create([
-            'reg_no' => 'STU2024001',
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'department_id' => Departments::where('code', 'CSE')->first()->id,
-            'password' => Hash::make('password123'),
-            'level' => 'intermediate',
-            'streak_days' => 7,
-            'total_progress' => 45
-        ]);
+        Students::updateOrCreate(
+            ['email' => 'john@example.com'],
+            [
+                'reg_no' => 'STU2024001',
+                'name' => 'John Doe',
+                'department_id' => Departments::where('code', 'CSE')->first()->id,
+                'password' => Hash::make('password123'),
+                'level' => 'intermediate',
+                'streak_days' => 7,
+                'total_progress' => 45,
+            ]
+        );
 
+        $this->call(ComprehensiveCoursesSeeder::class);
+        $this->call(CSEDetailedCoursesSeeder::class);
+        $this->call(ECEDetailedCoursesSeeder::class);
+        $this->call(AIMLDetailedCoursesSeeder::class);
+        $this->call(MECHDetailedCoursesSeeder::class);
+        $this->call(AERODetailedCoursesSeeder::class);
         $this->call(DepartmentDiagnosticQuestionSeeder::class);
         $this->call(ModuleQuestionSeeder::class);
-        $this->call(CseAdditionalCoursesSeeder::class);
     }
 }

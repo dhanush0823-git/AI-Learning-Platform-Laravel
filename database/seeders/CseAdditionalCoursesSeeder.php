@@ -4,13 +4,15 @@ namespace Database\Seeders;
 
 use App\Models\Course;
 use App\Models\Departments;
-use App\Models\Lessons;
 use App\Models\Modules;
 use App\Models\Question;
+use Database\Seeders\Concerns\SeedsRichCourseContent;
 use Illuminate\Database\Seeder;
 
 class CseAdditionalCoursesSeeder extends Seeder
 {
+    use SeedsRichCourseContent;
+
     public function run(): void
     {
         $department = Departments::query()->where('code', 'CSE')->first();
@@ -230,6 +232,11 @@ class CseAdditionalCoursesSeeder extends Seeder
         ];
 
         foreach ($courses as $courseData) {
+            $courseData['youtube_link'] = $this->resolveCourseYoutubeLink(
+                $courseData['title'],
+                $courseData['youtube_link'] ?? null
+            );
+
             $course = Course::updateOrCreate(
                 ['title' => $courseData['title']],
                 [
@@ -266,50 +273,15 @@ class CseAdditionalCoursesSeeder extends Seeder
 
     protected function seedLessons(Course $course, Modules $module, ?array $customLessons = null): void
     {
-        if (is_array($customLessons)) {
-            foreach ($customLessons as $index => $lessonData) {
-                Lessons::updateOrCreate(
-                    [
-                        'module_id' => $module->id,
-                        'lesson_number' => $index + 1,
-                    ],
-                    [
-                        'title' => $lessonData['title'],
-                        'content' => $lessonData['content'],
-                        'lesson_type' => $lessonData['type'],
-                        'duration' => $lessonData['duration'],
-                        'video_url' => $lessonData['video_url'],
-                    ]
-                );
-            }
-
-            return;
-        }
-
-        foreach (range(1, 8) as $lessonNumber) {
-            $lessonType = match ($lessonNumber % 4) {
-                1 => 'reading',
-                2 => 'video',
-                3 => 'quiz',
-                default => 'reading',
-            };
-
-            $topicNumber = (($module->module_number - 1) * 8) + $lessonNumber;
-
-            Lessons::updateOrCreate(
-                [
-                    'module_id' => $module->id,
-                    'lesson_number' => $lessonNumber,
-                ],
-                [
-                    'title' => "Lesson {$lessonNumber}: {$course->title} Topic {$topicNumber}",
-                    'content' => "This lesson covers topic {$topicNumber} for {$course->title} in module {$module->module_number}.",
-                    'lesson_type' => $lessonType,
-                    'duration' => 15,
-                    'video_url' => $lessonType === 'video' ? 'https://www.youtube.com/watch?v=sample' : null,
-                ]
-            );
-        }
+        $this->syncModuleLessons(
+            $module,
+            $course->title,
+            $module->title,
+            $module->description,
+            [],
+            $customLessons ?? [],
+            10
+        );
     }
 
     protected function seedQuestions(int $departmentId, Course $course, Modules $module, array $topics): void
